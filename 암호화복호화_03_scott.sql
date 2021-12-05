@@ -2,37 +2,37 @@ select user
 from dual;
 --==>> scott
 
---¡á¡á¡á ¾ÏÈ£È­ º¹È£È­ È®ÀÎ ½Ç½À ¡á¡á¡á--
+--â– â– â–  ì•”í˜¸í™” ë³µí˜¸í™” í™•ì¸ ì‹¤ìŠµ â– â– â– --
 CREATE TABLE TBL_EXAM
 ( ID    NUMBER    
 , PW    VARCHAR2(20)   
 );
---==>> Table TBL_EXAMÀÌ(°¡) »ı¼ºµÇ¾ú½À´Ï´Ù.
+--==>> Table TBL_EXAMì´(ê°€) ìƒì„±ë˜ì—ˆìŠµë‹ˆë‹¤.
 
 --INSERT INTO TBL_EXAM(ID, PW) VALUES(1,'java006$');
 INSERT INTO TBL_EXAM(ID, PW) VALUES(1, CRYPTPACK.ENCRYPT('java006$', '1234'));
---==>> 1 Çà ÀÌ(°¡) »ğÀÔµÇ¾ú½À´Ï´Ù.
+--==>> 1 í–‰ ì´(ê°€) ì‚½ì…ë˜ì—ˆìŠµë‹ˆë‹¤.
 
 
 
---¡Û µ¥ÀÌÅÍ Á¶È¸
+--â—‹ ë°ì´í„° ì¡°íšŒ
 SELECT * 
 FROM TBL_EXAM;
 --==>> 1	j??s
 
---¡Û µ¥ÀÌÅÍ Á¶È¸
+--â—‹ ë°ì´í„° ì¡°íšŒ
 SELECT ID, CRYPTPACK.DECRYPT(PW, '1111')
 FROM TBL_EXAM;
 --==>> 1	???
 
---¡Û µ¥ÀÌÅÍ Á¶È¸
+--â—‹ ë°ì´í„° ì¡°íšŒ
 SELECT ID, CRYPTPACK.DECRYPT(PW, '2222')
 FROM TBL_EXAM;
 --==>> 1	??D?
 
---¡Û µ¥ÀÌÅÍ Á¶È¸ ( ¿Ã¹Ù¸¥ ºñ¹Ğ¹øÈ£ '1234' ÀÔ·ÂÇßÀ» °æ¿ì)
+--â—‹ ë°ì´í„° ì¡°íšŒ ( ì˜¬ë°”ë¥¸ ë¹„ë°€ë²ˆí˜¸ '1234' ì…ë ¥í–ˆì„ ê²½ìš°)
 SELECT ID, CRYPTPACK.DECRYPT(PW, '1234')
-FROM TBL_EXAM;
+FROM TBL_EXAM; 
 --==>> 1	java006$
 
 
