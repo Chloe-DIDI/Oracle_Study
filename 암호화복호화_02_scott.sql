@@ -2,9 +2,9 @@ select user
 from dual;
 --==>> scott
 
---(ÇöÀç SCOTT À¸·Î ¿¬°áµÈ »óÅÂ)
+--(í˜„ìž¬ SCOTT ìœ¼ë¡œ ì—°ê²°ëœ ìƒíƒœ)
 
---¡Û ÆÐÅ°Áö ¼±¾ð(CRYPTPACK)
+--â—‹ íŒ¨í‚¤ì§€ ì„ ì–¸(CRYPTPACK)
 CREATE OR REPLACE PACKAGE CRYPTPACK
 AS
     FUNCTION ENCRYPT(STR VARCHAR2, HASH VARCHAR2)
@@ -14,10 +14,10 @@ AS
     RETURN VARCHAR2;
     
 END CRYPTPACK;
---==>> Package CRYPTPACKÀÌ(°¡) ÄÄÆÄÀÏµÇ¾ú½À´Ï´Ù.
+--==>> Package CRYPTPACKì´(ê°€) ì»´íŒŒì¼ë˜ì—ˆìŠµë‹ˆë‹¤.
 
 
---¡Û ÆÐÅ°Áö ¸öÃ¼(CRYPTPACK)
+--â—‹ íŒ¨í‚¤ì§€ ëª¸ì²´(CRYPTPACK)
 CREATE OR REPLACE PACKAGE BODY CRYPTPACK
 IS
     CRYPTED_STRING VARCHAR2(2000);
@@ -32,7 +32,7 @@ IS
         , KEY_STRING        => RPAD(HASH, 8, '#')
         , ENCRYPTED_STRING  => CRYPTED_STRING
         );
-        RETURN CRYPTED_STRING;
+        RETURN CRYPTED_STRING; 
     END;
     
     FUNCTION DECRYPT(XCRYPT VARCHAR2, HASH VARCHAR2)
@@ -48,7 +48,7 @@ IS
     END;
     
 END CRYPTPACK;
---==>> Package Body CRYPTPACKÀÌ(°¡) ÄÄÆÄÀÏµÇ¾ú½À´Ï´Ù.
+--==>> Package Body CRYPTPACKì´(ê°€) ì»´íŒŒì¼ë˜ì—ˆìŠµë‹ˆë‹¤.
 
 
 
