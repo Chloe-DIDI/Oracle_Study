@@ -3,69 +3,69 @@ FROM DUAL;
 --==>> SYS
 
 
---¡á¡á¡á ¾ÏÈ£È­ ¹× º¹È£È­ ¡á¡á¡á
+--â– â– â–  ì•”í˜¸í™” ë° ë³µí˜¸í™” â– â– â– 
 
---1. ¿À¶óÅ¬ÀÇ ¾ÏÈ£È­ ±â´ÉÀ» »ç¿ëÇÏ±â À§ÇØ¼­´Â
---   DBSM_OBFUSCATION_TOOLKIT ÆÐÅ°Áö¸¦ ÀÌ¿ëÇÑ´Ù.
---   (°ü·Ã ÆÐÅ°Áö¸¦ È°¿ëÇÏÁö ¾Ê°í ¾ÏÈ£È­, º¹È£È­ ¾Ë°í¸®ÁòÀ» Á÷Á¢ ±¸ÇöÇÒ ¼ö ÀÖ´Ù.)
+--1. ì˜¤ë¼í´ì˜ ì•”í˜¸í™” ê¸°ëŠ¥ì„ ì‚¬ìš©í•˜ê¸° ìœ„í•´ì„œëŠ”
+--   DBSM_OBFUSCATION_TOOLKIT íŒ¨í‚¤ì§€ë¥¼ ì´ìš©í•œë‹¤.
+--   (ê´€ë ¨ íŒ¨í‚¤ì§€ë¥¼ í™œìš©í•˜ì§€ ì•Šê³  ì•”í˜¸í™”, ë³µí˜¸í™” ì•Œê³ ë¦¬ì¦˜ì„ ì§ì ‘ êµ¬í˜„í•  ìˆ˜ ìžˆë‹¤.)
 
---2. DBMS_OBFUSCATION_TOOLKIT ÆÐÅ°Áö´Â
---   ±âº»Àû(default)À¸·Î´Â »ç¿ëÇÒ ¼ö ¾ø´Â »óÅÂ·Î ¼³Á¤µÇ¾î ÀÖÀ¸¹Ç·Î
---   Ãß°¡ ¼³Ä¡ ¹× ¼³Á¤ °úÁ¤ÀÌ ÇÊ¿äÇÏ´Ù.
---   ÀÌ¸¦ À§ÇØ
---   dbmsobtk.sql, prvtobtk.plb ÆÄÀÏÀ» Ã£¾Æ ½ÇÇàÇÑ´Ù.
+--2. DBMS_OBFUSCATION_TOOLKIT íŒ¨í‚¤ì§€ëŠ”
+--   ê¸°ë³¸ì (default)ìœ¼ë¡œëŠ” ì‚¬ìš©í•  ìˆ˜ ì—†ëŠ” ìƒíƒœë¡œ ì„¤ì •ë˜ì–´ ìžˆìœ¼ë¯€ë¡œ
+--   ì¶”ê°€ ì„¤ì¹˜ ë° ì„¤ì • ê³¼ì •ì´ í•„ìš”í•˜ë‹¤.
+--   ì´ë¥¼ ìœ„í•´
+--   dbmsobtk.sql, prvtobtk.plb íŒŒì¼ì„ ì°¾ì•„ ì‹¤í–‰í•œë‹¤.
 
--->> ºÀÀÎµÇ¾îÀÖ´ø ÆÐÅ°Áö¸¦ Ç®¾î¹ö¸°°Í dbmsobtk, prvtobtk
+-->> ë´‰ì¸ë˜ì–´ìžˆë˜ íŒ¨í‚¤ì§€ë¥¼ í’€ì–´ë²„ë¦°ê²ƒ dbmsobtk, prvtobtk
 @C:\oraclexe\app\oracle\product\11.2.0\server\rdbms\admin\dbmsobtk.sql
 --==>>
 /*
-Library DBMS_OBFUSCATION_LIBÀÌ(°¡) ÄÄÆÄÀÏµÇ¾ú½À´Ï´Ù.
-Library CRYPTO_TOOLKIT_LIBRARYÀÌ(°¡) ÄÄÆÄÀÏµÇ¾ú½À´Ï´Ù.
-Package DBMS_CRYPTOÀÌ(°¡) ÄÄÆÄÀÏµÇ¾ú½À´Ï´Ù.
-SYNONYM DBMS_CRYPTOÀÌ(°¡) »ý¼ºµÇ¾ú½À´Ï´Ù.
-Package DBMS_OBFUSCATION_TOOLKITÀÌ(°¡) ÄÄÆÄÀÏµÇ¾ú½À´Ï´Ù.
-SYNONYM DBMS_OBFUSCATION_TOOLKITÀÌ(°¡) »ý¼ºµÇ¾ú½À´Ï´Ù.
-GrantÀ»(¸¦) ¼º°øÇß½À´Ï´Ù.
-Package DBMS_SQLHASHÀÌ(°¡) ÄÄÆÄÀÏµÇ¾ú½À´Ï´Ù.
-SYNONYM DBMS_SQLHASHÀÌ(°¡) »ý¼ºµÇ¾ú½À´Ï´Ù.
+Library DBMS_OBFUSCATION_LIBì´(ê°€) ì»´íŒŒì¼ë˜ì—ˆìŠµë‹ˆë‹¤.
+Library CRYPTO_TOOLKIT_LIBRARYì´(ê°€) ì»´íŒŒì¼ë˜ì—ˆìŠµë‹ˆë‹¤.
+Package DBMS_CRYPTOì´(ê°€) ì»´íŒŒì¼ë˜ì—ˆìŠµë‹ˆë‹¤.
+SYNONYM DBMS_CRYPTOì´(ê°€) ìƒì„±ë˜ì—ˆìŠµë‹ˆë‹¤.
+Package DBMS_OBFUSCATION_TOOLKITì´(ê°€) ì»´íŒŒì¼ë˜ì—ˆìŠµë‹ˆë‹¤.
+SYNONYM DBMS_OBFUSCATION_TOOLKITì´(ê°€) ìƒì„±ë˜ì—ˆìŠµë‹ˆë‹¤.
+Grantì„(ë¥¼) ì„±ê³µí–ˆìŠµë‹ˆë‹¤.
+Package DBMS_SQLHASHì´(ê°€) ì»´íŒŒì¼ë˜ì—ˆìŠµë‹ˆë‹¤.
+SYNONYM DBMS_SQLHASHì´(ê°€) ìƒì„±ë˜ì—ˆìŠµë‹ˆë‹¤.
 */
 
 @C:\oraclexe\app\oracle\product\11.2.0\server\rdbms\admin\prvtobtk.plb
 --==>>
-/*
-Package DBMS_CRYPTO_FFIÀÌ(°¡) ÄÄÆÄÀÏµÇ¾ú½À´Ï´Ù.
-Package Body DBMS_CRYPTO_FFIÀÌ(°¡) ÄÄÆÄÀÏµÇ¾ú½À´Ï´Ù.
-Package Body DBMS_CRYPTOÀÌ(°¡) ÄÄÆÄÀÏµÇ¾ú½À´Ï´Ù.
-Package DBMS_OBFUSCATION_TOOLKIT_FFIÀÌ(°¡) ÄÄÆÄÀÏµÇ¾ú½À´Ï´Ù.
-Package Body DBMS_OBFUSCATION_TOOLKIT_FFIÀÌ(°¡) ÄÄÆÄÀÏµÇ¾ú½À´Ï´Ù.
-Package Body DBMS_OBFUSCATION_TOOLKITÀÌ(°¡) ÄÄÆÄÀÏµÇ¾ú½À´Ï´Ù.
-Package Body DBMS_SQLHASHÀÌ(°¡) ÄÄÆÄÀÏµÇ¾ú½À´Ï´Ù.
+/* 
+Package DBMS_CRYPTO_FFIì´(ê°€) ì»´íŒŒì¼ë˜ì—ˆìŠµë‹ˆë‹¤.
+Package Body DBMS_CRYPTO_FFIì´(ê°€) ì»´íŒŒì¼ë˜ì—ˆìŠµë‹ˆë‹¤.
+Package Body DBMS_CRYPTOì´(ê°€) ì»´íŒŒì¼ë˜ì—ˆìŠµë‹ˆë‹¤.
+Package DBMS_OBFUSCATION_TOOLKIT_FFIì´(ê°€) ì»´íŒŒì¼ë˜ì—ˆìŠµë‹ˆë‹¤.
+Package Body DBMS_OBFUSCATION_TOOLKIT_FFIì´(ê°€) ì»´íŒŒì¼ë˜ì—ˆìŠµë‹ˆë‹¤.
+Package Body DBMS_OBFUSCATION_TOOLKITì´(ê°€) ì»´íŒŒì¼ë˜ì—ˆìŠµë‹ˆë‹¤.
+Package Body DBMS_SQLHASHì´(ê°€) ì»´íŒŒì¼ë˜ì—ˆìŠµë‹ˆë‹¤.
 */
 
---3. ÀÌ ÆÐÅ°Áö´Â 4°³ÀÇ ÇÁ·Î½ÃÀú·Î ÀÌ·ç¾îÁ® ÀÖ´Ù.
---   VARCHAR2 Å¸ÀÔÀ» Encrypt/Decrypt ÇÒ ¼ö ÀÖ´Â 2°³ÀÇ ÇÁ·Î½ÃÀú
---   RAM Å¸ÀÔÀ» Encrypt/Decrypt ÇÒ ¼ö ÀÖ´Â 2°³ÀÇ ÇÁ·Î½ÃÀú
---   (´Ù¸¥ Å¸ÀÔÀº Áö¿øÇÏÁö ¾Ê±â ¶§¹®¿¡ NUMBER ÀÎ °æ¿ì´Â TO_CHAR() ÀÌ¿ë)
+--3. ì´ íŒ¨í‚¤ì§€ëŠ” 4ê°œì˜ í”„ë¡œì‹œì €ë¡œ ì´ë£¨ì–´ì ¸ ìžˆë‹¤.
+--   VARCHAR2 íƒ€ìž…ì„ Encrypt/Decrypt í•  ìˆ˜ ìžˆëŠ” 2ê°œì˜ í”„ë¡œì‹œì €
+--   RAM íƒ€ìž…ì„ Encrypt/Decrypt í•  ìˆ˜ ìžˆëŠ” 2ê°œì˜ í”„ë¡œì‹œì €
+--   (ë‹¤ë¥¸ íƒ€ìž…ì€ ì§€ì›í•˜ì§€ ì•Šê¸° ë•Œë¬¸ì— NUMBER ì¸ ê²½ìš°ëŠ” TO_CHAR() ì´ìš©)
 
--- ¡Ø RAW, LONG RAW, ROWID Å¸ÀÔ
---    ±×·¡ÇÈ ÀÌ¹ÌÁö³ª µðÁöÅÐ »ç¿îµå µîÀ» ÀúÀå
---    HEXA-DECIMAL(16Áø¼ö) ÇüÅÂ·Î RETURN
---    ÀÌ Áß RAW ´Â VARCHAR2 ¿Í À¯»çÇÏ´Ù.
---    LONG RAW ´Â LONG °ú À¯»çÇÏÁö¸¸ ´ÙÀ½°ú °°Àº Á¦ÇÑ»çÇ×ÀÌ ÀÖ´Ù.
---    - ÀúÀå°ú ÃßÃâ¸¸ °¡´ÉÇÏ°í, DATA ¸¦ °¡°øÇÒ ¼ö ¾ø´Ù.
---    - LONG RAW ´Â LONG °ú °°Àº Á¦ÇÑ»çÇ×À» °®´Â´Ù.
+-- â€» RAW, LONG RAW, ROWID íƒ€ìž…
+--    ê·¸ëž˜í”½ ì´ë¯¸ì§€ë‚˜ ë””ì§€í„¸ ì‚¬ìš´ë“œ ë“±ì„ ì €ìž¥
+--    HEXA-DECIMAL(16ì§„ìˆ˜) í˜•íƒœë¡œ RETURN
+--    ì´ ì¤‘ RAW ëŠ” VARCHAR2 ì™€ ìœ ì‚¬í•˜ë‹¤.
+--    LONG RAW ëŠ” LONG ê³¼ ìœ ì‚¬í•˜ì§€ë§Œ ë‹¤ìŒê³¼ ê°™ì€ ì œí•œì‚¬í•­ì´ ìžˆë‹¤.
+--    - ì €ìž¥ê³¼ ì¶”ì¶œë§Œ ê°€ëŠ¥í•˜ê³ , DATA ë¥¼ ê°€ê³µí•  ìˆ˜ ì—†ë‹¤.
+--    - LONG RAW ëŠ” LONG ê³¼ ê°™ì€ ì œí•œì‚¬í•­ì„ ê°–ëŠ”ë‹¤.
 
 
---¡Û ÇØ´ç ÆÐÅ°Áö¸¦ »ç¿ëÇÒ ¼ö ÀÖµµ·Ï ±ÇÇÑ ºÎ¿©
+--â—‹ í•´ë‹¹ íŒ¨í‚¤ì§€ë¥¼ ì‚¬ìš©í•  ìˆ˜ ìžˆë„ë¡ ê¶Œí•œ ë¶€ì—¬
 GRANT EXECUTE ON DBMS_OBFUSCATION_TOOLKIT TO SCOTT;
---==>> GrantÀ»(¸¦) ¼º°øÇß½À´Ï´Ù.
---> SCOTT °èÁ¤À¸·Î DBMS_OBFUSCATION_TOOLKIT ÆÐÅ°ÁöÀÇ
---  ÇÁ·Î½ÃÀú¸¦ »ç¿ëÇÒ ¼ö ÀÖ´Â ±ÇÇÑ ºÎ¿©
+--==>> Grantì„(ë¥¼) ì„±ê³µí–ˆìŠµë‹ˆë‹¤.
+--> SCOTT ê³„ì •ìœ¼ë¡œ DBMS_OBFUSCATION_TOOLKIT íŒ¨í‚¤ì§€ì˜
+--  í”„ë¡œì‹œì €ë¥¼ ì‚¬ìš©í•  ìˆ˜ ìžˆëŠ” ê¶Œí•œ ë¶€ì—¬
 
 GRANT EXECUTE ON DBMS_OBFUSCATION_TOOLKIT TO PUBLIC;
---==>> GrantÀ»(¸¦) ¼º°øÇß½À´Ï´Ù.
---> PUBLIC À¸·Î DBMS_OBFUSCATION_TOOLKIT ÆÐÅ°ÁöÀÇ
---  ÇÁ·Î½ÃÀú¸¦ »ç¿ëÇÒ ¼ö ÀÖ´Â ±ÇÇÑ ºÎ¿©
+--==>> Grantì„(ë¥¼) ì„±ê³µí–ˆìŠµë‹ˆë‹¤. 
+--> PUBLIC ìœ¼ë¡œ DBMS_OBFUSCATION_TOOLKIT íŒ¨í‚¤ì§€ì˜
+--  í”„ë¡œì‹œì €ë¥¼ ì‚¬ìš©í•  ìˆ˜ ìžˆëŠ” ê¶Œí•œ ë¶€ì—¬
 
 
 
