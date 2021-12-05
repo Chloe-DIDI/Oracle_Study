@@ -1,0 +1,5061 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=euc-kr">
+<title>오라클 정리 - made by 엄기백</title>
+</head>
+ 
+<body>
+<p></p>
+
+<script language="JavaScript">
+
+var NS4 = (document.layers);   
+var IE4 = (document.all);
+
+var win = window;   
+var n   = 0;
+
+function findInPage(str) {
+
+  var txt, i, found;
+
+  if (str == "")
+    return false;
+
+   if (NS4) {
+
+   if (!win.find(str))
+      while(win.find(str, false, true))
+        n++;
+    else
+      n++;
+
+
+
+    if (n == 0)
+      alert("Not found.");
+  }
+
+  if (IE4) {
+    txt = win.document.body.createTextRange();
+
+   
+
+    for (i = 0; i <= n && (found = txt.findText(str)) != false; i++) {
+      txt.moveStart("character", 1);
+      txt.moveEnd("textedit");
+    }
+
+ 
+
+    if (found) {
+      txt.moveStart("character", -1);
+      txt.findText(str);
+      txt.select();
+      txt.scrollIntoView();
+      n++;
+    }
+
+  
+
+    else {
+      if (n > 0) {
+        n = 0;
+        findInPage(str);
+      }
+
+     
+
+      else
+        alert("Not found.");
+    }
+  }
+
+  return false;
+}
+
+</script>
+<a style="display:scroll;position:fixed;top:5px;left:500px;">
+<form name="search" onSubmit="return findInPage(this.string.value);">
+    <p><font size=3><input name="string" type="text" size=15 onChange="n = 0;"></font>
+<input type="submit" value="목차내검색"></a>
+
+
+
+
+
+
+
+<br><br>
+<p>목차 (클릭시 해당내용으로 이동, 위로 이동 화살표 클릭, 목차내 검색은 상단 박스이용) </p>
+<p><strong>1. sqlplus 사용자/관리자 설정</strong></p>
+<p><a href="#11">-- sys 계정 접속</a><br>
+  <a href="#12">-- scott lock 설정</a><br>
+  -- scott lock 해제<br>
+  <a href="#13">-- sys 계정으로 scott 암호 변경</a><br>
+  <a href="#14">-- sys 암호 변경</a><br>
+  <a href="#15">-- 오라클 서버 shutdown</a><br>
+  <a href="#16">-- 오라클 서버 startup</a><br>
+  <a href="#17">-- 사용자 확인(sys 계정)</a><br>
+  <a href="#18">-- 사용자 추가</a><br>
+  <a href="#19">-- 사용자 제거 </a><br>
+  <a href="#110">-- conn, 테이블 스페이스 권한 설정(sys 계정) </a><br>
+  <a href="#111">-- 휴지통 비우기</a><br>
+  <a href="#112">-- 테이블 컬럼 확인</a><br>
+  <a href="#113">-- 테이블 목록 확인</a><br>
+  <a href="#114">-- 테이블 구조 확인</a><br>
+</p>
+<p><strong>2. 기본 쿼리 함수</strong></p>
+<p><a href="#21">-- isql*plus 실행(사용자)</a><br>
+  <a href="#22">-- em 실행(관리자)</a><br>
+  <a href="#23">-- tnsnames.ora 에 정의된 connect_identifier 으로 접속</a><br>
+  <a href="#24">-- sql 에서 cmd 창으로 잠시 빠져 나가야 하는 경우</a><br>
+  <a href="#25">-- sqlplus 에서 *.sql 파일 실행</a><br>
+  <a href="#26">-- 경로 지정 실행</a><br>
+  <a href="#27">-- sqlplus 에서 sql 작업 내용 자동 저장</a><br>
+  <a href="#28">-- 산술연산자</a><br>
+  <a href="#29">-- 비교연산자</a><br>
+  <a href="#210">-- 논리 연산자</a><br>
+  <a href="#211">-- sql 연산자</a><br>
+  <a href="#212">-- 문자열 연결 연산자 : ||</a><br>
+  <a href="#213">-- 자료 검색</a><br>
+  <a href="#214">-- 기술 순서</a><br>
+  <a href="#215">-- 전체 자료 출력</a><a href="#216"><br>
+  -- 이름, 전화번호, 부서 출력</a><br>
+  <a href="#217">-- 필드명 변경</a><br>
+  <a href="#218">-- 연산</a><br>
+  <a href="#219">-- 조건 검색</a><br>
+  <a href="#220">-- dual</a><br>
+  <a href="#221">-- 스칼라 함수</a><br>
+  <a href="#222">-- substr</a><br>
+  <a href="#223">-- length</a><br>
+  <a href="#224">-- lengthb</a><br>
+  <a href="#225">-- instr</a><br>
+  <a href="#226">-- lpad / rpad</a><br>
+  <a href="#227">-- replace</a><br>
+  <a href="#228">-- trim / ltrim / rtrim</a><br>
+  <a href="#229">-- mod</a><br>
+  <a href="#230">-- round</a><br>
+  <a href="#231">-- trunc1</a><br>
+  <a href="#232">-- 암시적 형 변환</a><br>
+  <a href="#233">-- 날짜형식 변경</a><br>
+  <a href="#234">-- to_number</a><br>
+  <a href="#235">-- to_date</a><br>
+  <a href="#236">-- 살아온날 구하기</a><br>
+  <a href="#237">-- 근무년수 계산하기</a><br>
+  <a href="#238">-- sysdate</a><br>
+  <a href="#239">-- current_date</a><br>
+  <a href="#240">-- add_months</a><br>
+  <a href="#241">-- last_day(d)</a><br>
+  <a href="#242">-- 나이 구하기</a><br>
+  <a href="#243">-- trunc2</a><br>
+  <a href="#244">-- next_day</a><br>
+  <a href="#245">-- 시스템 날짜 기준 가까운 날짜</a><br>
+  <a href="#246">-- 다가오는 일요일, 토요일 </a><br>
+  <a href="#247">-- 날짜에 산술 연산</a><br>
+  <a href="#248">-- null</a><br>
+  <a href="#249">-- null 관련 함수</a><br>
+  <a href="#250">-- order by</a><br>
+  <a href="#251">-- distinct</a><br>
+  <a href="#252">-- in</a><br>
+  <a href="#253">-- between ~ and</a><br>
+  <a href="#254">-- like</a><br>
+  <a href="#255">-- decode</a><br>
+  <a href="#256">-- case ~ end</a><br>
+  <a href="#257">-- 집합연산자</a><br>
+  <a href="#258">-- 합집합 연산자</a><br>
+  <a href="#259">-- 차집합 연산자</a><br>
+  <a href="#260">-- 교집합 연산자</a><br>
+</p>
+<p><strong>3. 그룹함수</strong></p>
+<p><a href="#31">-- 집계함수</a><br>
+  <a href="#32">-- count</a><br>
+  <a href="#33">-- sum, avg, max, min</a><br>
+  <a href="#34">-- group by</a><br>
+  <a href="#35">-- having</a><br>
+  <a href="#36">-- rollup</a><br>
+  <a href="#37">-- cube</a><br>
+  <a href="#38">-- grouping 함수</a><br>
+  <a href="#39">-- grouping sets 함수</a><br>
+  <a href="#310">-- rownum</a><br>
+  -- 분석함수<br>
+  <a href="#311">-- rank() over() 함수</a><br>
+  <a href="#312">-- dense_rank() over() 함수</a><br>
+  <a href="#313">-- row_number() over() 함수</a><br>
+  <a href="#314">-- count() over() 함수</a><br>
+  <a href="#315">-- sum() over() 함수</a><br>
+  <a href="#316">-- avg() over() 함수</a><br>
+  <a href="#317">-- first_value() over() 함수</a><br>
+  <a href="#318">-- first 와 last</a><br>
+</p>
+<p><strong><a href="#41">4. 테이블작성/수정/삭제</a></strong></p>
+<p><a href="#42">-- 컬럼명만 확인</a><br>
+  <a href="#43">-- 컬럼명 및 자료형등 출력</a><br>
+  <a href="#44">-- 제약조건 확인 </a><br>
+  <a href="#45">-- 사용자에게 주어진 권한 확인</a><br>
+  <a href="#46">-- 자료형</a><br>
+  <a href="#47">-- 문자데이터 타입 varchar2 외</a><br>
+  <a href="#48">-- 숫자데이터 타입 number</a><br>
+  <a href="#49">-- 날짜데이터 타입 date</a><br>
+  <a href="#42">-- 테이블 작성</a><br>
+  <a href="#411">-- 테이블 목록 확인</a><br>
+  <a href="#412">-- 테이블 구조 확인</a><br>
+  <a href="#413">-- 테이블에 필드 추가 </a><br>
+  <a href="#414">-- 테이블의 컬럼폭 및 자료형 변경 </a><br>
+  <a href="#415">-- 테이블의 필드명 변경 </a><br>
+  <a href="#416">-- 테이블의 필드 삭제 </a><br>
+  <a href="#417">-- 테이블명 변경</a><br>
+  <a href="#418">-- 기존 테이블을 이용하여 테이블 작성 </a><br>
+  <a href="#419">-- 테이블 구조만 복사(제약조건은 복사 되지 않는다) </a><br>
+  <a href="#420">-- 테이블 삭제 </a><br>
+  <a href="#421">-- 휴지통</a><br>
+  <a href="#422">-- 휴지통 확인 </a><br>
+  <a href="#423">-- 휴지통 테이블 내용 확인(휴지통 정보 확인 후 object_name 명으로 확인) </a><br>
+  <a href="#424">-- 휴지통 복원(insa1 은 삭제하기 전의 원래 테이블명) </a><br>
+  <a href="#425">-- 휴지통 복원(bin 이름(object_name)으로 되돌리기)</a> <br>
+  <a href="#426">-- 휴지통 비우기</a><br>
+  <a href="#427">-- 휴지통에 버리지 않고 바로 테이블 삭제 </a><br>
+</p>
+<p><strong><a href="#51">5. 자료 추가/수정/삭제</a> </strong></p>
+<p><a href="#52">-- 테이블에 데이터 추가 </a><br>
+  <a href="#53">-- 구조만복사(제약 조건은 복사 되지 않음) </a><br>
+  <a href="#54">-- 제약조건 확인 </a><br>
+  <a href="#55">-- 여러행 추가(기존 테이블의 자료를 추가) </a><br>
+  <a href="#56">-- 하나의 insert문을 이용 여러 테이블에 데이터 추가 </a><br>
+  <a href="#57">-- 조건에 만족하는 자료만 여러 테이블에 추가 </a><br>
+  <a href="#58">-- 수정 : update</a><br>
+  <a href="#59">-- 자료 삭제 </a><br>
+  <a href="#510">-- 모든 자료 삭제(테이블 구조는 지워지지 않는다.) </a><br>
+  <a href="#511">-- 조건에 만족하는 데이터 삭제 </a><br>
+  <a href="#512">-- 모든 자료 삭제(delete 보다 빠름)</a><br>
+  <a href="#513">-- score 테이블의 여자만 삭제 </a><br>
+  <a href="#514">-- merge(병합) </a><br>
+</p>
+<p><strong>6. 제약조건 </strong></p>
+<p><a href="#61">-- 제약조건 확인</a> <br>
+  <a href="#62">-- 개체 무결성(primary key, unique) </a><br>
+  <a href="#63">-- 참조 무결성(foreign key) </a><br>
+  <a href="#64">-- 컬럼 레벨 기본키 지정 </a><br>
+  <a href="#65">-- 제약 조건 이름 부여 </a><br>
+  <a href="#66">-- 기본키 삭제 </a><br>
+  <a href="#67">-- 이미 존재하는 테이블에 기본키 추가</a><br>
+  <a href="#68">-- unique </a><br>
+  <a href="#69">-- 컬럼 레벨 </a><br>
+  <a href="#610">-- 테이블 레벨 </a><br>
+  <a href="#611">-- 존재하는 필드에 check 제약 추가 </a><br>
+  <a href="#612">-- not null 추가 </a><br>
+  <a href="#613">-- 존재하는 테이블에 not null 추가 </a><br>
+  <a href="#614">-- default(초기값) : insert, update</a><br>
+  <a href="#615">-- default 제거 </a><br>
+  <a href="#616">-- 제약조건 제거 </a><br>
+  <a href="#617">-- 기본키 제거 </a><br>
+  <a href="#618">-- not null 제거 </a><br>
+  <a href="#619">-- 기타 제약조건 제거</a><br>
+  <a href="#620">-- 참조(외래, foreign)키 </a><br>
+  <a href="#621">-- 참조키 삭제 </a><br>
+  <a href="#622">-- 존재하는 테이블에 참조키 추가 </a><br>
+  <a href="#623">-- 제약 조건 활성화/비활성화 </a><br>
+  <a href="#624">-- 기본키 비활성화 </a><br>
+  <a href="#625">-- name에 not null 제약설정 </a><br>
+  <a href="#626">-- not null 비활성화 </a><br>
+  <a href="#627">-- 기본키활성화 </a><br>
+</p>
+<p><strong>7. 조인 </strong></p>
+<p><a href="#71">-- equi 조인 </a><br>
+  <a href="#72">-- outer join(외부 조인) </a><br>
+  <a href="#73">-- left outer join </a><br>
+  <a href="#74">-- right outer join </a><br>
+  <a href="#75">-- full outer join(left와 right outer join 결합형태) </a><br>
+  <a href="#76">-- non-equi 조인 </a><br>
+  <a href="#77">-- cross join </a><br>
+  <a href="#78">-- self join </a><br>
+</p>
+<p><strong>8. 서브쿼리 </strong></p>
+<p><a href="#81">-- 서브쿼리(subquery) </a><br>
+  <a href="#82">-- 서점코드 서점명 판매금액합 비율 </a><br>
+  <a href="#83">-- 1. 년도별 판매현황 출력 </a><br>
+  <a href="#84">-- 2. 년도별 서점 판매현황 출력 </a><br>
+  <a href="#85">-- 3. 년도별 서점 판매현황이 가장 많은 자료 출력 </a><br>
+  <a href="#86">-- with </a><br>
+  <a href="#87">-- 판매된 책코드, 책이름 </a><br>
+  <a href="#88">-- 판매되지 않은 책코드, 책이름 </a><br>
+  <a href="#89">-- exists : 하나라도 존재하면 참 </a><br>
+  <a href="#810">-- 상관 하위 부질의 </a><br>
+  <a href="#811">-- 서점별로 1회 주문 수량이 가장 많은 책(서점명, 책이름, 수량) </a><br>
+  <a href="#812">-- 기본급을 기준으로 순위 부여 </a><br>
+</p>
+<p><strong>9. 뷰 시퀀스</strong></p>
+<p><a href="#91">-- 뷰란?</a><br>
+  <a href="#92">-- 사용자 권한 설정</a><br>
+  <a href="#93">-- 뷰 작성</a><br>
+  <a href="#94">-- 뷰 수정</a><br>
+  <a href="#95">-- 뷰 삭제</a><br>
+  <a href="#96">-- 뷰 자료 입력/수정/삭제</a><br>
+  <a href="#97">-- with check option </a><br>
+  <a href="#98">-- 머트리얼라이즈 뷰(Materialized view)</a><br>
+  <a href="#99">-- 사용자에게 쿼리 재작성/Materialized view 권한설정 후 실행</a><br>
+  <a href="#910">-- 시퀀스(Sequence)</a><br>
+  <a href="#911">-- 사용자에게 시퀀스 권한설정</a><br>
+  <a href="#912">-- 100부터 1씩 증가하는 시퀀스</a><br>
+  <a href="#913">-- 3부터 999까지 3씩 증가하는 시퀀스</a><br>
+  <a href="#914">-- 최대값 도달시 다시 시작</a><br>
+  <a href="#915">-- 1부터 증가하는 가장 간단한 시퀀스</a><br>
+  <a href="#916">-- 시퀀스 목록 확인</a><br>
+  <a href="#917">-- 시퀀스 활용 (테이블 자료 입력)</a><br>
+  <a href="#911">-- 시퀀스 삭제</a><br>
+</p>
+<p><strong>10. 계층적 질의</strong></p>
+<p><a href="#101">-- 계층적 질의</a><br>
+  <a href="#102">-- start with</a><br>
+  <a href="#103">-- connect by</a><br>
+  <a href="#104">-- prior 연산자</a><br>
+  <a href="#105">-- where절</a><br>
+  <a href="#106">-- level절</a><br>
+    <a href="#107">-- 예제</a><br>
+</p>
+<p><strong>11. 트랜잭션</strong></p>
+<p><a href="#111">-- 트랜잭션 </a><br>
+  <a href="#112">-- set transaction</a><br>
+  <a href="#113">-- set autocommit</a><br>
+  <a href="#114">-- lock</a><br>
+</p>
+<p><strong>12. PL/SQL</strong></p>
+<p><a href="#121">-- PL/SQL이란?</a><br>
+  <a href="#122">-- 대입문 형식 </a><br>
+  <a href="#123">-- %type</a><br>
+  <a href="#124">-- %rowtype</a><br>
+  <a href="#125">-- 사용자 정의 구조체 변수</a><br>
+  <a href="#126">-- if문 활용예제</a><br>
+  <a href="#127">-- while 조건 loop ~ end loop</a><br>
+  <a href="#128">-- exit</a><br>
+  <a href="#129">-- loop ~ end loop</a><br>
+  <a href="#1210">-- for ~ loop문 활용예제</a><br>
+</p>
+<p><strong>13-1. 프로시져</strong></p>
+<p><a href="#131">-- 프로시져</a><br>
+  <a href="#132">-- 사용자에게 프로시져 권한설정</a><br>
+  <a href="#133">-- 형식</a><br>
+  <a href="#134">-- in / out</a><br>
+  <a href="#135">-- 시퀀스 작성</a><br>
+  <a href="#136">-- 테이블 작성</a><br>
+  <a href="#137">-- 테이블에 데이터 추가하는 프로시저 작성</a><br>
+  <a href="#138">-- 프로시져 소스 확인</a><br>
+  <a href="#139">-- 프로시저 목록 확인</a><br>
+  <a href="#1310">-- 프로시저 실행</a><br>
+  <a href="#1311">-- 프로시저 수정</a><br>
+  <a href="#1312">-- 테이블에 필드 추가</a><br>
+  <a href="#1313">-- 입력시 조건에 따라 값 대입 예제</a><br>
+  <a href="#1314">-- 자료 수정 프로시져 작성</a><br>
+  <a href="#1315">-- 삭제 프로시져 작성</a><br>
+  <a href="#1316">-- 출력용 view 작성 </a><br>
+  <a href="#1317">-- 추가 프로시져 / 테스트 / 오류</a><br>
+  <a href="#1318">-- 수정 프로시져1 / 테스트</a><br>
+  <a href="#1319">-- 수정 프로시져2</a><br>
+  <a href="#1320">-- 삭제 프로시져</a><br>
+  <br>
+  <br>
+  <br>
+  <strong>13-2. 프로시져 문제</strong></p>
+<p><a href="#1321">-- 두개의 테이블작성 / 뷰 작성</a><br>
+  <a href="#1322">-- 두개의 테이블에 데이터 추가하는 프로시져 작성</a><br>
+  <a href="#1323">-- 두개의 테이블에 데이터 삭제하는 프로시져 작성</a><br>
+  <a href="#1324">-- 두개의 테이블에 데이터 수정하는 프로시져 작성</a><br>
+</p>
+<p><strong>14. 사용자 정의 함수</strong></p>
+<p><a href="#141">-- Stored Function(사용자 함수)</a><br>
+  <a href="#142">-- 형식</a><br>
+  <a href="#143">-- 함수 목록 확인</a><br>
+  <a href="#144">-- 합을 구하는 함수 만들기</a><br>
+  <a href="#145">-- fnPow(10, 2) : 10의 2승</a><br>
+  <a href="#146">-- 주민번호로 성별 / 생일 / 나이 계산</a><br>
+</p>
+<p><strong>15. 커서와 동적 SQL</strong></p>
+<p><a href="#151">-- 커서(Cursor)</a><br>
+  <a href="#152">-- 암시적 커서</a><br>
+  <a href="#153">-- 암시적 커서의 속성</a><br>
+  <a href="#154">-- 명시적 커서</a><br>
+  <a href="#155">-- 작업순서</a><br>
+  <a href="#156">-- 커서선언</a><br>
+  <a href="#157">-- 커서 open</a><br>
+  <a href="#158">-- fetch</a><br>
+  <a href="#159">-- 커서 close</a><br>
+  <a href="#1510">-- for문에서의 커서 사용 </a><br>
+  <a href="#1511">-- 형식</a><br>
+  <a href="#1512">-- where current of</a><br>
+  <a href="#1513">-- 조건 만족 데이터 가져오기</a><br>
+  <a href="#1514">-- 커서내의 For : 자동 open, 자동 close</a><br>
+  <a href="#1515">-- 파라미터가 있는 커서</a><br>
+  <a href="#1516">-- sys refcursor, 레퍼런스 커서(reference cursor)</a><br>
+  <a href="#1517">-- 테이블작성</a><br>
+  <a href="#1518">-- 프로시져1</a><br>
+  <a href="#1519">-- 프로시져2 / 실행</a><br>
+  <a href="#1520">-- 동적SQL / 주의</a><br>
+  <a href="#1521">-- 동적 테이블 생성 / 동적 쿼리 실행</a><br>
+  <a href="#1522">-- 예제: 테이블 작성, 자료입력/출력/수정/삭제</a><br>
+</p>
+<p><strong>16-1. 트리거</strong></p>
+<p><a href="#161">-- 트리거(Trigger)</a><br>
+  <a href="#162">-- 문장트리거</a><br>
+  <a href="#163">-- 행트리거</a><br>
+  <a href="#164">-- 형식</a><br>
+  <a href="#165">-- 이벤트</a><br>
+  <a href="#166">-- 트리거상태 확인</a><br>
+  <a href="#167">-- 트리거 삭제</a><br>
+  <a href="#168">-- 트리거 권한 부여</a><br>
+  <a href="#169">-- 문장트리거 예제 : 테이블에 추가/수정/삭제 되면 다른 테이블에 시간과 상태 저장</a><br>
+  <a href="#1610">-- 테이블의 프로시저, 함수, 패키지 등 상호 참조관계 확인</a><br>
+  <a href="#1611">-- before 트리거</a><br>
+  <a href="#1612">-- raise_application_error</a><br>
+  <a href="#1613">-- 행트리거 예제</a><br>
+  <a href="#1614">-- 행트리거(after) : 추가</a><br>
+  <a href="#1615">-- 행트리거(before) : 삭제</a><br>
+  <a href="#1616">-- 행트리거(after) : 수정</a><br>
+</p>
+<p><strong><a href="#1617">16-2. 트리거 실습</a></strong></p>
+<p><a href="#1618">-- 상품테이블 작성</a><br>
+  <a href="#1619">-- 입고테이블 작성</a><br>
+  <a href="#1620">-- 판매테이블 작성</a><br>
+  <a href="#1621">-- 상품테이블에 자료추가</a><br>
+  <a href="#1622">-- 트리거 작성</a><br>
+  <a href="#1623">-- 입고테이블에 insert 트리거 작성</a><br>
+  <a href="#1624">-- 입고테이블에 update 트리거 작성</a><br>
+  <a href="#1625">-- 입고테이블에 delete 트리거 작성</a><br>
+  <a href="#1626">-- 판매테이블에 insert 트리거 작성</a><br>
+  <a href="#1627">-- 판매테이블에 update 트리거 작성</a><br>
+  <a href="#1628">-- 판매테이블에 delete 트리거 작성</a><br>
+</p>
+<p><strong>17. 예외처리</strong></p>
+<p><a href="#171">-- 예외 처리</a><br>
+  <a href="#172">-- 예외 트랩</a><br>
+  <a href="#173">-- 예외 전달</a><br>
+  <a href="#174">-- 예외 검출</a><br>
+  <a href="#175">-- 예외 유형</a><br>
+  <a href="#176">-- 예외 정의</a><br>
+  <a href="#177">-- 정의된 오라클 서버 에러</a><br>
+  <a href="#178">-- 사용자 정의 예외</a><br>
+  <a href="#179">-- 예외 트래핑 함수</a><br>
+  <a href="#1710">-- raise_application_error</a><br>
+</p>
+<p><strong>18. 패키지</strong></p>
+<p><a href="#181">-- 패키지</a><br>
+  <a href="#182">-- 패키지 작성방법</a><br>
+  <a href="#183">-- 패키지 명세</a><br>
+  <a href="#184">-- 패키지 몸체 구현</a><br>
+  <a href="#185">-- 오버로딩</a><br>
+</p>
+<p><strong>19. 테이블스페이스</strong></p>
+<p><a href="#191">-- 테이블 스페이스</a><br>
+  <a href="#192">-- 시스템 테이블 스페이스 종류</a><br>
+  <a href="#193">-- 참고(block, extent, segment, 테이블스페이스)</a><br>
+  <a href="#194">-- sys 계정</a><br>
+  <a href="#195">-- 데이터사전 dba_tablespaces / dba_data_files</a><br>
+  <a href="#196">-- 테이블 스페이스 공간 확인</a><br>
+  <a href="#197">-- 테이블 스페이스 생성</a><br>
+  <a href="#198">-- 부여된 테이블 스페이스 용량 확인(사용자)</a><br>
+  <a href="#199">-- 테이블 스페이스 용량 변경(관리자)</a><br>
+  <a href="#1910">-- 테이블 스페이스 삭제</a><br>
+  <a href="#1911">-- 테이블 스페이스 자동 확장</a><br>
+</p>
+<p><strong><a href="#201">20. 사용자 관리</a></strong></p>
+<p><a href="#202">-- 주요 자료사전(data dictionary)</a><br>
+  <a href="#203">-- 사용자 목록 확인 </a><br>
+  <a href="#204">-- 시스템 권한 확인</a><br>
+  <a href="#205">-- 롤 확인</a><br>
+  <a href="#206">-- 롤에 부여된 시스템 권한 확인</a><br>
+  <a href="#207">-- 롤에 존재하는 롤 확인</a><br>
+  <a href="#208">-- 롤이 가지고 있는 객체권한(insert, select 등) 확인</a><br>
+  <a href="#209">-- 테이블스페이스 할당량 확인</a><br>
+  <a href="#2010">-- 사용자 시스템 권한 확인</a><br>
+  <a href="#2011">-- 사용자에게 부여된 롤 확인</a><br>
+  <a href="#2012">-- 가지고 있는 객체 권한 확인</a><br>
+  <a href="#2013">-- 다른 사용자로부터 받은 객체 권한 확인</a><br>
+  <a href="#2014">-- 테이블 컬럼 확인</a><br>
+  <a href="#2015">-- 제약조건 확인</a><br>
+  <a href="#2012">-- 현재 사용자의 column에 할당된 제약조건 정보</a><br>
+  <a href="#2017">-- procedure, function 목록 확인</a><br>
+  <a href="#2018">-- 테이블의 procedure, 함수, 패키지 등 상호 참조 관계 확인</a><br>
+  <a href="#2019">-- 트리거 확인</a><br>
+  <a href="#2020">-- 프로시저, 함수 등의 소스 확인</a><br>
+  <a href="#2021">-- 뷰 목록, 소스 확인</a><br>
+  <a href="#2022">-- 시퀀스 목록 확인</a><br>
+  <a href="#2023">-- 사용자 확인, 락 설정/해제</a><br>
+  <a href="#2024">-- 사용자 추가</a><br>
+  <a href="#2025">-- 사용자 삭제</a><br>
+  <a href="#2026">-- 테이블스페이스 사용 권한과 함께 사용자 추가</a><br>
+  <a href="#2027">-- sys 계정 암호 관리</a><br>
+  <a href="#2028">-- sys의 사용자 암호 변경</a><br>
+  <a href="#2029">-- 사용자가 자신의 암호 변경</a><br>
+  <a href="#2030">-- sys가 사용자의 암호 만료</a><br>
+  <a href="#2031">-- 시스템 권한</a><br>
+  <a href="#2032">-- 사용자가 시스템 권한 확인</a><br>
+  <a href="#2033">-- db접근 권한 부여</a><br>
+  <a href="#2034">-- 권한 회수</a><br>
+  <a href="#2035">-- 사용자 제거</a><br>
+  <a href="#2036">-- 객체권한 확인</a><br>
+  <a href="#2037">-- 사용자 자신이 가지고 있는 객체권한 확인</a><br>
+  <a href="#2038">-- 다른 사용자로부터 받은 객체권한 확인</a><br>
+  <a href="#2039">-- 롤(Role) 이란?</a><br>
+  <a href="#2040">-- 롤 생성 과정</a><br>
+  <a href="#2041">-- 롤 생성</a><br>
+  <a href="#2038">-- 롤에 객체 권한 부여</a><br>
+  <a href="#2043">-- 객체 권한 확인</a><br>
+  <a href="#2044">-- 롤 변경: 롤 암호제거/사용자에게 롤부여/사용자에게 롤적용</a><br>
+  <a href="#2045">-- 롤 권한 확인 (시스템)</a><br>
+  <a href="#2046">-- 롤 회수</a><br>
+  <a href="#2047">-- public 롤</a><br>
+</p>
+<p><strong><a href="#2101">21. 데이터링크</a></strong></p>
+<p><a href="#2102">-- 데이터 링크 권한 설정</a><br>
+  <a href="#2103">-- tnsnames.ora 에 정의된 connect_identifier 으로 접속</a><br>
+</p>
+<p><strong>22. 암호화 및 복호화</strong></p>
+<p><a href="#2201">-- 암호화 및 복호화 : 4개의 프로시져 구성</a><br>
+  <a href="#2202">-- sys 계정: 모든 사용자에게 dmbs_obfuscation_toolkit 패키지의 프로시져 권한 부여 </a><br>
+  <a href="#2203">-- 사용자 계정: 패키지 선언, 패키지 몸체, 테스트</a><br>
+</p>
+<p><strong>23. SYS_RefCursor</strong></p>
+<p><a href="#2301">-- Sys RefCursor 예제</a><br>
+  <a href="#2302">-- 테이블의 자료를 출력하는 프로시져(Sys_RefCursor이용)</a><br>
+</p>
+<p><strong>24. 인덱스</strong></p>
+<p><a href="#2401">-- 인덱스란?</a><br>
+  <a href="#2402">-- 특징</a><br>
+  <a href="#2403">-- 생성</a><br>
+  <a href="#2404">-- 종류</a><br>
+  <a href="#2405">-- Logical 인덱스</a><br>
+  <a href="#2406">-- Physical 인덱스</a><br>
+  <a href="#2407">-- Index 생성에 유의할점</a><br>
+  <a href="#2408">-- Index를 생성할 수 없는 경우</a><br>
+  <a href="#2409">-- Index의 형식</a><br>
+  <a href="#2410">-- Index 정보 조회</a><br>
+  <a href="#2411">-- Index 생성</a><br>
+  <a href="#2412">-- 성능향상을 위한 조회시간 표시</a><br>
+  <a href="#2413">-- B-Tree 인덱스</a><br>
+  <a href="#2414">-- 인덱스 삭제</a><br>
+  <a href="#2415">-- Bitmap 인덱스</a><br>
+  <a href="#2416">-- Function based Index(함수 기반 인덱스)</a><br>
+  <a href="#2417">-- 인덱스 재생성</a></p>
+<p><br>
+</form>
+  <p><br>
+  </p>
+  <p><strong>1. sqlplus 사용자/관리자 설정
+  </strong> </p>
+  <p>-- sys 계정 접속<a name="11"></a><br>
+  cmd&gt;sqlplus sys/암호 as sysdba; <br>
+sql&gt;select * from all_users; -- 전체 사용자 확인 </p>
+<p>-- scott lock 설정<a name="12"></a><br>
+sql&gt;alter user scott account lock; </p>
+<p>-- scott 계정<br>
+  sql&gt;conn scott/java301$; -- 에러 : lock 걸림 </p>
+<p>-- soctt lock 해제<br>
+sql&gt;alter user scott account unlock; </p>
+<p>-- sys 계정으로 scott 암호 변경<a name="13"></a><br>
+sql&gt;alter user scott identified by 암호; </p>
+<p>-- sys 암호 변경<a name="14"></a><br>
+  cmd&gt;sqlplus / as sysdba; <br>
+  sql&gt;alter user sys identified by 암호; <br>
+sql&gt;conn sys/암호 as sysdba; </p>
+<p>-- 오라클 서버 shutdown<a name="15"></a><br>
+  sql&gt;conn sys/암호 as sysdba; <br>
+sql&gt;shutdown immediate; </p>
+<p>-- sys 계정으로 connect 했을때 다음과 같은 메시지가 출력 된 경우 <br>
+  -- 휴지 인스턴스에 접속되었습니다. <br>
+-- 데이터베이스가 close 된 상태이므로 sys 계정에서 startup </p>
+<p>-- 오라클 서버 startup <a name="16"></a><br>
+  cmd&gt;sqlplus /nolog; <br>
+  sql&gt;conn sys/암호 as sysdba; <br>
+  sql&gt;startup; </p>
+<p>-- 사용자 확인(sys 계정)<a name="17"></a><br>
+  select username, password, created from dba_users; <br>
+  select username, password, created from dba_users <br>
+where username='scott'; --scott 계정만 확인 </p>
+<p>-- 사용자 추가<a name="18"></a><br>
+create user 사용자명 identified by 비밀번호; </p>
+<p>-- 사용자 제거<a name="19"></a><br>
+drop user 사용자명 cascade; </p>
+<p>-- conn, 테이블 스페이스 권한 설정(sys 계정)<a name="110"></a><br>
+grant connect, resource to 사용자명; </p>
+<p>-- 휴지통 비우기<a name="111"></a><br>
+purge recyclebin; </p>
+<p>-- 테이블 컬럼 확인<a name="112"></a><br>
+  select * from user_tab_columns where table_name='테이블명'; <br>
+select * from all_tab_columns where owner ='디비계정' and table_name = '테이블명'; </p>
+<p>-- 테이블 목록 확인<a name="113"></a><br>
+sql&gt;select * from tab; </p>
+<p>-- 테이블 구조 확인<a name="114"></a><br>
+sql&gt;desc insa; </p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><strong>2. 기본 쿼리 함수</strong></p>
+<p>-- isql*plus 실행(사용자)<a name="21"></a><br>
+<a href="http://컴퓨터명:5560/isqlplus/">http://컴퓨터명:5560/isqlplus/ </a></p>
+<p>-- em 실행(관리자)<a name="22"></a><br>
+<a href="http://컴퓨터명:1158/em/">http://컴퓨터명:1158/em/ </a></p>
+<p>-- tnsnames.ora 에 정의된 connect_identifier 으로 접속 <a name="23"></a><br>
+  cmd&gt;sqlplus <a href="mailto:scott/tiger@ora111">scott/tiger@ora111 </a><br>
+-- ora111 : tnsnames.ora 에 정의된 connect_identifier </p>
+<p>-- sql 에서 cmd 창으로 잠시 빠져 나가야 하는 경우<a name="24"></a><br>
+  sql&gt;host <br>
+cmd&gt;exit -- 복귀 </p>
+<p>-- sqlplus 에서 *.sql 파일 실행<a name="25"></a><br>
+  -- 파일이 존재하는 경로에서 sqlplus를 실행하고, <br>
+  -- "@파일명" 명령을 실행 <br>
+sql&gt;@ex.sql </p>
+<p>-- 경로 지정 실행<a name="26"></a><br>
+sql&gt;@d:\sql\ex.sql </p>
+<p>-- sqlplus 에서 sql 작업 내용 자동 저장<a name="27"></a><br>
+  sql&gt;spool d:\sql\test.txt <br>
+  sql&gt;select * from insa; -- d:\sql\test.txt 파일 생성 <br>
+sql&gt;spool off -- 스풀 정지 </p>
+<p>-- 산술연산자<a name="28"></a><br>
++ : 덧셈 - : 뺄셈 * : 곱셈 / : 나눗셈 ( ) : 괄호 </p>
+<p>-- 비교연산자<a name="29"></a><br>
+  = : 같다. &gt; : 크다. &gt;= : 크거나 같다. <br>
+&lt; : 적다. &lt;= : 작거나 같다. &lt;&gt; : 같지 않다. != : 같지 않다. </p>
+<p>-- 논리 연산자 <a name="210"></a><br>
+and : 논리 곱 or : 논리 합 not : 부정 </p>
+<p>-- sql 연산자<a name="211"></a><br>
+  in(값, 값, ...) : 피연산자가 식 목록 중 하나와 동일한 경우 true → OR <br>
+  between ~ and: 피연산자가 범위 안에 있는 경우 true <br>
+like : 피연산자가 패턴과 일치하는 경우 true </p>
+<p>-- 문자열 연결 연산자 : ||<a name="212"></a><br>
+select name || ' 님' as 이름, city 출신도 from insa; </p>
+<p>-- 자료 검색<a name="213"></a><br>
+  -- 형식 : select 필드명, 필드명 ..... from 테이블 <br>
+  <br>
+  -- 기술 순서<a name="214"></a><br>
+from -&gt; where조건 -&gt; group by -&gt; select -&gt; order by </p>
+<p>-- 전체 자료 출력<a name="215"></a><br>
+sql&gt;select * from insa; </p>
+<p>-- 이름, 전화번호, 부서 출력<a name="216"></a><br>
+select name, tel, buseo from insa; </p>
+<p>-- 필드명 변경 : 필드명 as 별칭 / 필드명 as "별 칭" / 필드명 별칭...<a name="217"></a><br>
+select name as 이름, tel as "전화번호", buseo 부서 from insa; </p>
+<p>-- 연산 : 이름과 기본급을 10,000으로 나눈 값 출력<a name="218"></a><br>
+select name, basicpay/10000 기본급 from insa; </p>
+<p>-- 조건 검색 : 출신도 서울인 사람 출력(이름, 출신도)<a name="219"></a><br>
+select name, city from insa where city='서울'; </p>
+<p>-- 조건 검색 : 출신도 서울, 기본급 200만원 이상 출력(이름, 출신도, 기본급) <br>
+  select name, city, basicpay from insa <br>
+  where city='서울' and basicpay&gt;=2000000; </p>
+<p>-- 기본급+수당이 200만원 이상이고 서울사람(이름, 기본급+수당 출신도) <br>
+  select name as 이름, basicpay+sudang as "급여",city as 출신도 from insa <br>
+  where basicpay+sudang&gt;=2000000 and city='서울'; </p>
+<p>-- dual<a name="220"></a><br>
+  -- dual 테이블은 데이터 딕셔너리와 함께 oracle에 의해 자동으로 생성되는 <br>
+  -- 테이블로 사용자 sys의 스키마에 존재하며, 모든 사용자가 사용 가능하다. <br>
+select sysdate from dual; -- 시스템내 현재 날짜 표시 </p>
+<p>-- 스칼라 함수 : 단일데이터를 반환<a name="221"></a><br>
+  -- substr (char, m [,n]) : 문자열 추출 <br>
+  select substr('seoul korea', 7, 3) from dual; -- 'kor' → 앞기준, 7번째부터 3번 이동한 값 출력 <br>
+  select substr('seoul korea', -5, 3) from dual; -- 'kor' → 뒤기준, 5번째부터 3번 이동한 값 출력 <br>
+select substr('seoul korea', 7) from dual; -- 'korea' → 앞기준, 7번째부터 모두 출력 </p>
+<p>-- 출신도 서울이고 주민번호 8번째의 첫번째 숫자가 1 또는 3인 사람 출력(이름, 주민번호, 출신도)<a name="222"></a><br>
+  select name, ssn, city from insa <br>
+  where city='서울' and <br>
+(substr(ssn, 8, 1)='1' or substr(ssn, 8, 1)='3'); </p>
+<p>-- 위와 같으나 in 연산자를 이용하여 간결하게 <br>
+  select name, ssn, city from insa <br>
+  where city='서울' and <br>
+  (substr(ssn, 8, 1) in ('1', '3')); </p>
+<p>-- 생년월일이 78~82년생만 출력(이름, 주민번호) <br>
+  select name, ssn from insa <br>
+  where substr(ssn, 1, 2) &gt;= 78 and substr(ssn, 1, 2) &lt;= 82; <br>
+  -- 주민번호 1번째부터 2번째의 값이 78보다 크거나 같고 82보다 작거나 같은 조건 </p>
+<p>-- 서울사람이면서 김씨만 출력(이름, 출신도) <br>
+  select name, city from insa where city='서울' and substr(name, 1, 1)='김'; <br>
+  -- 이름의 첫번째 값이 '김' 과 같은 조건 </p>
+<p>-- length (column | expression) : 문자열 길이<a name="223"></a><br>
+select length('대한민국') from dual; -- 4 </p>
+<p>-- lengthb (column | expression) : 문자열 바이트수<a name="224"></a><br>
+select lengthb('대한민국') from dual; -- 8 </p>
+<p>-- instr (column | expression, 'string' [,m] [,n])<a name="225"></a><br>
+  -- 문자의 위치 반환. m값은 시작위치, n값은 발생 횟수이며 m과 n의 기본 값은 1 <br>
+select instr('korea','e') from dual; -- 4 </p>
+<p>-- lpad (column | expression, n, ['string']), rpad (column | expression, n, ['string'])<a name="226"></a><br>
+  -- expression의 문자열을 제외한 공간에 문자열을 왼쪽(오른쪽)에 채운다. <br>
+  select lpad ('korea', 12, '*') from dual; -- '*******korea' <br>
+select lpad('*', 0, '*') from dual; -- null </p>
+<p>-- replace (text, search_string [, replacement_string]) : 문자열 치환<a name="227"></a><br>
+  select replace('seoul korea', 'seoul', 'busan') from dual; <br>
+select name, replace(buseo, '부', '팀') as "부서" from insa; </p>
+<p>-- rtrim(char [,set]), ltrim(char [,set])<a name="228"></a><br>
+  trim (leading | trailing | both trim_character from trim_source) <br>
+공백을 제거하거나 오른쪽(왼쪽)의 문자열을 'set'문자열에 포함된 문자를 삭제, 없는 문자를 만나면 정지 </p>
+<p>select rtrim('우리나라 ') from dual; <br>
+  select rtrim('우리나라대한', '대한') from dual; -- 오른쪽의 '대한' 절삭 <br>
+  select trim(' 우리 ') from dual; <br>
+  select name, rtrim(buseo, '부') || '팀' as "부서" from insa; <br>
+  select ltrim('aabbbbcdad', 'ba') from dual; -- 결과 : cdad(ba중 한문자라도 첫부분에 포함되어 있으면 제거) </p>
+<p>-- mod(m, n) : m을 n으로 나눈 나머지<a name="229"></a><br>
+select mod(11, 4) "나머지" from dual; </p>
+<p>-- round(n [,m]) : 반올림 → 미입력시 기본값은 0이며 1은 소수점 둘째가 반올림되어 첫째자리가 표시되고 -는 반대<a name="230"></a><br>
+  select round(15.193, 1) "반올림" from dual; -- 15.2 <br>
+  select round(15.193) from dual; -- 15 <br>
+  select round(15.193, 0) from dual; -- 15 <br>
+  select round(15.193, -1) from dual; -- 20 <br>
+select trunc(15.79, -1) "절삭" from dual; -- 10 </p>
+<p>-- trunc(n [,m]) : 절삭 → round와 형식은 같다.<a name="231"></a><br>
+  select trunc(15.79, 1) "truncate" from dual; -- 15.7 <br>
+select trunc(15.79, -1) "truncate" from dual; -- 10 </p>
+<p>select name, trunc(basicpay/10000) 만원권 from insa; </p>
+<p>-- 기본급 10만원당 * 출력 <br>
+  select name, basicpay, <br>
+  lpad('*', trunc(basicpay/100000), '*') 그래프 from insa; <br>
+  -- trunc(basicpay/100000) 결과가 1보다 적으면 null 출력 </p>
+<p>-- 암시적 형 변환<a name="232"></a><br>
+값을 할당할 때 오라클 서버는 다음과 같이 자동으로 값을 변환할 수 있다. </p>
+<p>varchar2, char → number <br>
+  varchar2, char → date <br>
+  number → varchar2 <br>
+  date → varchar2 </p>
+<p>-- to_char(label [, fmt]) : mlslabel datatype을 varchar2 타입으로 변환 <br>
+  -- to_char(n [, fmt [, 'nlsparams'] ]) : 숫자를 문자로 변환(varchar2 타입) <br>
+  -- to_char(d [, fmt [, 'nlsparams'] ]) : 날짜를 문자로 변환(varchar2 타입) </p>
+<p>select to_char(sysdate, 'yyyy-mm-dd hh24:mi:ss') now from dual; <br>
+  select sysdate, to_char(sysdate, 'yyyy-mm-dd day') from dual; <br>
+  select sysdate, to_char(sysdate, 'yyyy"년" mm"월" dd"일"') from dual; <br>
+  select sysdate, to_char(sysdate, 'dd "of" month') from dual; -- 07/04/05 05 of april <br>
+  select to_char(-1234, '99999mi') from dual; -- 1234- <br>
+  select to_char(-1234, '9999pr') from dual; -- &lt;1234&gt; <br>
+  select to_char(1234.345, '9.999eeee') from dual; -- 1.234e+03 <br>
+  select to_char(1234, '999999v9999') from dual; -- 12340000 <br>
+  select to_char(1234, 'l9,999,999') from dual; -- ￦1,234 </p>
+<p>select name, basicpay+sudang 급여 from insa; <br>
+  select name, to_char(basicpay+sudang, 'L9,999,999') 급여 from insa; -- L : 통화기호 <br>
+  select name, to_char(ibsadate, 'yyyy"년" mm"월" dd"일" day') 입사일 from insa; <br>
+  select name, ibsadate from insa where to_char(ibsadate,'yyyy') = '2000'; -- 입사날짜의 형식을 yyyy로 바꿔 2000과 같은 값 출력 </p>
+<p>-- 날짜형식 변경(기본:rr/mm/dd)<a name="233"></a><br>
+alter session set nls_date_format='yyyy-mm-dd'; </p>
+<p>-- rr : 1900년대의 년도를 기준으로 하여 이전 50년도에서 이후 49년까지는 기준년도와 <br>
+  -- 가까운 1850년도에서 1949년도까지의 값으로 표현하고, 이 범위를 벗아 날 경우 다시 <br>
+  -- 2000년을 기준으로 이전 50년도에서 이후 49년까지의 값을 출력한다. 하지만 yy는 <br>
+  -- 무조건 system 상의 년도를 따른다. </p>
+<p>-- to_number(char [,fmt [, 'nlsparams'] ]) : 문자를 숫자로 변환 (그닥 잘 사용될일 없음)<a name="234"></a></p>
+<p>-- to_date(char [, fmt [, 'nlsparams'] ]) : 문자를 날짜로 변환 (그닥 잘 사용될일 없음)<a name="235"></a></p>
+<p>-- 살아온 날 수 구하기<a name="236"></a><br>
+select trunc(sysdate - to_date('2000/10/10', 'yyyy/mm/dd')) "살아온날수" from dual; </p>
+<p>-- 근무년수 계산하기 : trunc<a name="237"></a><br>
+select name, trunc((sysdate-ibsadate)/365) 근무년수 from insa; </p>
+<p>-- 월을 한국 또는 영어권 스타일로 출력 <br>
+  select to_char(sysdate, 'mon dd day', 'nls_date_language = american') as en, <br>
+  to_char(sysdate, 'mon dd day', 'nls_date_language = korean') as ko from dual; </p>
+<p>-- sysdate : 시스템에 저장된 현재 날짜를 반환<a name="238"></a><br>
+  select sysdate from dual; -- 07/04/05 <br>
+select name, trunc(sysdate-ibsadate) 근무일수 from insa; </p>
+<p>-- current_date : 현재 session의 날짜 정보를 반환<a name="239"></a><br>
+select current_date from dual; -- 07/04/05 </p>
+<p>-- add_months(d, n) : 해당 날짜에 n만큼의 달수를 더한다.<a name="240"></a><br>
+select current_date "today", add_months(current_date,1) "next month" from dual; </p>
+<p>-- last_day(d) : 정의된 날짜의 달에서 마지막일이 몇일인지 돌려준다.<a name="241"></a><br>
+select sysdate, last_day(sysdate) "last day", last_day(sysdate) - sysdate "days left" from dual; </p>
+<p>-- 입사월의 마지막 날짜는 ??(30, 31, 29, 28 등) <br>
+  select name, ibsadate, last_day(ibsadate) from insa; </p>
+<p>-- months_between(d1, d2) : 정의된 두 날짜사이의 차이(d1 - d2)를 월로 돌려준다. <br>
+  select months_between(to_date('2007-05-20', 'yyyy-mm-dd'), <br>
+  to_date('2007-04-10', 'yyyy-mm-dd')) from dual; -- 1.32258065 </p>
+<p>-- 근무년수 계산하기 : trunc, months_between <br>
+  select name, ibsadate, trunc(months_between(sysdate, ibsadate)/12) 근무년수 from insa; </p>
+<p>-- 현재 날짜에서 주민번호상의 날짜의 차로 나이 구하기(1900년대 생이라는 전제하에)<a name="242"></a><br>
+  select ssn, trunc(months_between(sysdate, to_date('19'||substr(ssn,1,6), 'yyyymmdd'))/12) <br>
+나이 from insa; </p>
+<p>-- round(d [,fmt]) : 정해진 날짜를 fmt를 기준으로 반올림 <br>
+  select round(to_date('2007-07-10', 'yyyy-mm-dd'),'year') "first of the year" <br>
+  from dual; -- 08/01/01(년 반올림. 7월 1일부터 반올림) </p>
+<p>select name, ibsadate, round(ibsadate, 'month') from insa; -- 월 반올림(16일 기준) </p>
+<p>-- trunc(d,[fmt]) : 정해진 날짜를 fmt를 기준으로 버림<a name="243"></a><br>
+  select trunc(to_date('27-08-04','dd-mm-yy'), 'year') from dual; -- 04/01/01 <br>
+select name, ibsadate, trunc(ibsadate, 'month') from insa; -- 모두 출력 </p>
+<p>-- next_day(d, char)<a name="244"></a><br>
+  명시된 요일(char)이 돌아오는 날짜를 계산. 요일은 숫자로 표현 가능(sunday : 1, monday : 2, ...) <br>
+select next_day(to_date('07/05/01', 'yy/mm/dd'), 6) from dual; -- 07/05/04 </p>
+<p>-- 오늘을 기준으로 가장 가까운 수요일은 언제 ??<a name="245"></a><br>
+select sysdate, next_day(sysdate, '수요일') from dual; </p>
+<p>-- 이번주 일요일, 토요일 알아내기<a name="246"></a><br>
+  select sysdate, <br>
+  case <br>
+  when to_char(sysdate, 'day') = '일요일' then sysdate <br>
+  else next_day(sysdate,1)-7 <br>
+  end as 주시작일, <br>
+  case <br>
+  when to_char(sysdate, 'day') = '토요일' then sysdate <br>
+  else next_day(sysdate, '토요일') <br>
+  end 주마지막일, <br>
+from dual; </p>
+<p>-- 날짜에 산술 연산을 사용하는 경우<a name="247"></a><br>
+  날짜 + 숫자 → 날짜 : 날짜에 일수를 더하여 날짜 계산 <br>
+  날짜 - 숫자 → 날짜 : 날짜에 일수를 감하여 날짜 계산 <br>
+  날짜 + 숫자/24 → 날짜 : 날짜에 시간을 더하여 날짜 계산 <br>
+날짜 - 날짜 → 일수 : 날짜에 날짜를 감하여 일수 계산 </p>
+<p>-- null : 값이 존재하지 않은 상태<a name="248"></a><br>
+  is null : null 이면 참 <br>
+not is null : null 이 아니면 참 </p>
+<p>-- null 관련 함수<a name="249"></a><br>
+  nvl(expr1, expr2) : expr1이 null 이면 expr2 반환 <br>
+  nvl2(expr1, expr2, expr3) : expr1이 null이 아니면 expr2를 반환하고, null이면 expr3를 반환 <br>
+  nullif(expr1, expr2) : 두 표현식을 비교해서 같으면 null 반환하고, 같지 않으면 expr1을 반환 <br>
+  coalesce(expr1, expr2, ……, exprn) : 표현식 목록에서 첫 번째로 null이 아닌 것을 반환한다. <br>
+  즉, expr1이 널이 아니면 expr1을 반환하며, expr1이 널이고 expr2가 널이 아니면 expr2를 반환한다. <br>
+  lnnvl(조건) : 조건이 거짓이거나 값이 존재하지 않으면 true를 리턴하며, 조건이 거짓이면 false를 리턴 한다. <br>
+select 리스트에서는 사용할 수 없으며 where 절에서만 사용 가능 하다. </p>
+<p>select name, tel from insa where tel is null; <br>
+  select name, tel from insa where tel is not null; <br>
+  select name, nvl(tel, '0000-0000') tel from insa; <br>
+  select name, nvl(tel, '0000-0000') tel from insa where tel is null; <br>
+  select name, nvl2(tel, tel, '0000-0000') tel from insa; </p>
+<p>-- order by : 정렬<a name="250"></a><br>
+  -- asc : 오름차순, desc : 내림차순 <br>
+  select name, city, basicpay+sudang pay from insa <br>
+order by basicpay+sudang asc; </p>
+<p>select name, city, basicpay+sudang pay from insa <br>
+  order by basicpay+sudang desc; </p>
+<p>select name, city, basicpay+sudang pay from insa <br>
+  order by city desc, basicpay+sudan; </p>
+<p>select name, city, basicpay+sudang pay from insa <br>
+  order by city desc, basicpay+sudan desc; </p>
+<p>select name, city, basicpay+sudang pay from insa <br>
+  where substr(ssn, 8, 1) in ('1', '3') <br>
+  order by city desc, basicpay+sudan desc; </p>
+<p>-- 서울 사람중에서 기본급+수당 내림차순으로 정렬 <br>
+  이름, 출신도, 기본급+수당 <br>
+  select name, city, basicpay+sudang pay from insa <br>
+  where city='서울' <br>
+  order by pay desc; -- 필드의 별명은 order by에 사용 가능 </p>
+<p>-- 여자중 부서오름차순으로 정렬하고 부서가 같으면 기본급 내림차순 정렬 <br>
+  이름, 주민번호, 부서, 기본급 <br>
+  select name, ssn, buseo, basicpay from insa <br>
+  where sustr(ssn, 8, 1) in (2, 4) <br>
+  order by buseo, basicpay desc; </p>
+<p>-- distinct : 중복 배제(반대 : all -- 기본)<a name="251"></a><br>
+select buseo from insa; </p>
+<p>select distinct buseo from insa; <br>
+  select distinct buseo, jikwi from insa; </p>
+<p>-- in<a name="252"></a><br>
+in(값, 값, ...) : 피연산자가 식 목록 중 하나와 동일한 경우 true </p>
+<p>select name, city from insa where city = '서울' or <br>
+  city = '인천' or city = '광주' or city = '부산' <br>
+  select name, city from insa where city in ('서울', '인천', '광주', 부산') </p>
+<p>-- between ~ and : 피연산자가 범위 안에 있는 경우 참<a name="253"></a><br>
+  select name, basicpay from insa <br>
+where basicpay &gt;=1500000 and basicpay &lt;=2000000; </p>
+<p>select name, basicpay from insa <br>
+  where basicpay between 1500000 and 2000000; </p>
+<p>select name, ibsadate from insa <br>
+  where ibsadate between '2000-01-01' and '2000-12-31'; </p>
+<p>-- like : 주어진 문자열이 패턴과 일치하는지 여부 확인<a name="254"></a><br>
+  -- % : 여러문자 공통 <br>
+-- _ : 한문자 공통 </p>
+<p>select name from insa where name like '김%'; <br>
+  select name from insa where name not like '김%'; <br>
+  select tel from insa where tel like '%3%'; <br>
+  select tel from insa where tel like '%3%' or tel like '%5%'; <br>
+  select ssn from insa where ssn like '_0%'; <br>
+  select tel from insa where tel like '%%'; </p>
+<p>-- decode : 각각의 조건에 맞는 값에 대한 처리를 결과를 리턴<a name="255"></a><br>
+  select name, ssn, <br>
+  decode(substr(ssn, 8,1),'1','남자','3','남자','2','여자','4','여자') 성별 <br>
+from insa; </p>
+<p>select name, ssn, <br>
+  decode(substr(ssn, 8,1), '1', '남자') 성별 from insa; </p>
+<p>-- 이름, 성별, 나이 출력 <br>
+  -- 성별 : 주민번호(ssn의 8번째)가 1,3-&gt;남자 2,4-&gt;여자 <br>
+  -- 나이 : 주민번호를 이용 <br>
+  select name, <br>
+  decode(substr(ssn,8,1), '1','남자','2','여자','3','남자','4','여자') 성별, <br>
+  trunc(months_between(sysdate, to_date('19'||substr(ssn,1,6),'yyyymmdd'))/12) 나이 <br>
+  from insa; </p>
+<p>select name, <br>
+  decode(mod(substr(ssn,8,1), 2),1,'남자',0,'여자') 성별, <br>
+  trunc(months_between(sysdate, to_date('19'||substr(ssn,1,6),'yyyymmdd'))/12) 나이 <br>
+  from insa; </p>
+<p>-- case ~ end : 조건에 따라 다른 결과를 리턴해야 하는 경우(decode 보다 성능 우수)<a name="256"></a><br>
+  select name, basicpay+sudang pay, <br>
+  case <br>
+  when (basicpay+sudang) &gt;= 2500000 then <br>
+  round((basicpay+sudang) * 0.03, -1) <br>
+  when (basicpay+sudang) &gt;= 2000000 then <br>
+  round((basicpay+sudang) * 0.02, -1) <br>
+  else 0 <br>
+  end as tax <br>
+from insa; </p>
+<p>-- 집합 연산자<a name="257"></a><br>
+  -- union : 첫 번째 sql문의 결과와 두 번째 sql문의 결과 중 중복된 데이터를 제거한다. <br>
+  -- union all : 첫 번째 sql문의 결과와 두 번째 sql문의 결과를 모두 출력한다. <br>
+  -- minus : 차집합. 첫 번째 sql문 결과에는 있고, 두 번째 sql문의 결과에는 없는 데이터를 출력한다. <br>
+-- intersect : 인터섹트는 두 번째 sql문의 결과와 첫 번째 sql문의 결과에 중복된 행만 출력(교집합) </p>
+<p>-- 합집합 연산자 : union -&gt; 중복 데이터 한번만 출력<a name="258"></a><br>
+  select name, city, buseo from insa where buseo='개발부' <br>
+  union <br>
+select name, city, buseo from insa where city='인천'; </p>
+<p>-- 합집합 연산자 : union all -&gt; 중복 데이터도 출력<br>
+  select name, city, buseo from insa where buseo='개발부' <br>
+  union all <br>
+  select name, city, buseo from insa where city='인천' order by city; <br>
+  -- order by 는 마지막에 한번만 </p>
+<p>-- 합집합 연산자 : union <br>
+  -- 필드의 개수와 자료형이 일치하면 필드가 달라도 가능 <br>
+  select name, city, buseo,basicpay from insa where buseo='개발부' <br>
+  union <br>
+  select name, city, buseo,sudang from insa where city='인천'; </p>
+<p>-- 차집합<a name="259"></a><br>
+  select name, city, buseo from insa where buseo='개발부' <br>
+  minus <br>
+select name, city, buseo from insa where city='인천'; </p>
+<p>-- 교집합<a name="260"></a><br>
+  select name, city, buseo from insa where buseo='개발부' <br>
+  intersect <br>
+select name, city, buseo from insa where city='인천'; </p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><strong>3. 그룹함수</strong></p>
+<p>-- 집계함수(count, sum, avg, max, min) 등<a name="31"></a><br>
+  count : 행의 개수를 리턴 <br>
+  avg : null값을 제외한 행의 평균값을 출력한다. <br>
+  sum : null값을 제외한 합계를 출력한다. <br>
+  stddev : null값을 제외한 표준편차를 출력한다. <br>
+  variance : null값을 제외한 분산을 출력한다. <br>
+  max : 최대값을 출력한다. <br>
+min : 최소값을 출력한다. </p>
+<p>-- 집계함수는 where 절에 사용불가, group by를 사용하지 않는 경우 일반 필드와 사용불가 </p>
+<p>-- count : 자료의 개수 구하기<a name="32"></a><br>
+  select count(num) from insa; <br>
+  select count(*) from insa; <br>
+  select count(tel) from insa; <br>
+select count(nvl(tel, '0')) from insa; </p>
+<p>select count(decode(substr(ssn, 8, 1), '1', '1', '3', '1')) 남자, <br>
+  count(decode(substr(ssn, 8, 1), '2', '1', '4', '1')) 여자 <br>
+  from insa; </p>
+<p>select count(decode(mod(substr(ssn, 8, 1), 2), '1', '1')) 남자, <br>
+  count(decodemod(substr(ssn, 8, 1), 2), '0', '1')) 여자 <br>
+  from insa; </p>
+<p>select count(*) from insa where city='서울'; <br>
+  select count(decode(substr(ssn, 8, 1), '1', '1', '3', '1')) 서울남자 <br>
+  from insa where city='서울'; </p>
+<p>select count(distinct buseo) from insa; </p>
+<p>-- sum, avg, max, min<a name="33"></a><br>
+  select sum(basicpay), avg(basicpay), max(basicpay), <br>
+min(basicpay) from insa; </p>
+<p>select name, sum(basicpay) from insa; <br>
+  -- 오류(일반 필드와 집계함수는 같이 사용 불가) </p>
+<p>-- group by(그룹별 통계)<a name="34"></a><br>
+  select sum(basicpay) from insa <br>
+  group by buseo; <br>
+  select buseo, sum(basicpay) from insa <br>
+group by buseo; </p>
+<p>select buseo, jikwi, count(*) from insa <br>
+  group by buseo, jikwi <br>
+  order by buseo; </p>
+<p>select buseo, count(*) 인원수 from insa <br>
+  where substr(ssn, 8, 1) in ('2', '4') <br>
+  group by buseo; </p>
+<p>select buseo, <br>
+  count(decode(substr(ssn, 8, 1), '1', '1', '3', '1')) 남자, <br>
+  count(decode(substr(ssn, 8, 1), '2', '1', '4', '1')) 여자 <br>
+  from insa <br>
+  group by buseo; </p>
+<p>select count(*) from insa where buseo='개발부'; </p>
+<p>- having<a name="35"></a><br>
+그룹 또는 집계에 대한 검색 조건을 지정한다. having은 select 문하고만 사용될 수 있다. </p>
+<p>select buseo, count(*) from insa <br>
+  group by buseo <br>
+  having count(*) &gt;= 7; </p>
+<p>-- 부서별 인원수가 가장 많은 부서(rownum는 두개 이상의 부서가 <br>
+  -- 가장 많은 인원수를 가진 경우 부서 하나만 출력 된다.) <br>
+  select * from (select buseo, count(*) 인원수 from insa group by buseo <br>
+  order by 인원수 desc) where rownum =1; </p>
+<p>select buseo, 인원수 from (select buseo, count(*) 인원수, <br>
+  rank() over(order by count(*) desc) r from insa <br>
+  group by buseo ) i where i.r = 1; </p>
+<p>-- 여자 인원수가 가장 많은 부서 <br>
+  select buseo, 인원수 from (select buseo, count(*) 인원수, <br>
+  rank() over(order by count(*) desc) r from insa <br>
+  where substr(ssn, 8, 1) in ('2', '4') <br>
+  group by buseo ) i where i.r = 1; </p>
+<p>-- 출신도별 성별 인원수 <br>
+  select city,count(decode(substr(ssn,8, 1),1,1,3,1)) 남자, <br>
+  count(decode(substr(ssn,8,1),2,1,4,1)) 여자 <br>
+  from insa group by city; </p>
+<p>select city, <br>
+  decode(substr(ssn,8, 1),1,'남자',2,'여자',3,'남자',4,'여자') 성별 <br>
+  ,count(*) 인원수 from insa group by city, <br>
+  decode(substr(ssn,8, 1),1,'남자',2,'여자',3,'남자',4,'여자') <br>
+  order by city; </p>
+<p>-- 입사년도별 인원수 구하기 <br>
+  select to_char(ibsadate, 'yyyy') 입사년도, count(*) 인원수 <br>
+  from insa <br>
+  group by to_char(ibsadate, 'yyyy') <br>
+  order by 입사년도; </p>
+<p>-- 기본급이 평균 이하인 사원출력(이름, 기본급) <br>
+  select avg(basicpay) from insa; <br>
+  select name, basicpay <br>
+  from insa <br>
+  where basicpay &lt;= <br>
+  (select avg(basicpay) from insa); </p>
+<p>-- 부서별 남자인원수가 5명 이상인 부서와 남자인원수 <br>
+  select buseo, count(*) 남자인원수 <br>
+  from insa where substr(ssn,8,1) in (1, 3) <br>
+  group by buseo; </p>
+<p>select buseo, count(*) 남자인원수 <br>
+  from insa where substr(ssn,8,1) in (1, 3) <br>
+  group by buseo <br>
+  having count(*)&gt;=5; </p>
+<p>-- 부서별 여자인원수가 3명이상인 부서와 여자인원수출력 <br>
+  select buseo, count(*) from insa <br>
+  where substr(ssn, 8, 1) in (2, 4) <br>
+  group by buseo <br>
+  having count(*) &gt;= 3; </p>
+<p>-- 기본급+수당이 가장 많은 사람의 이름, 기본급+수당 출력 <br>
+  select name, (basicpay+sudang) 급여 <br>
+  from insa <br>
+  where (basicpay+sudang) = <br>
+  (select max(basicpay+sudang) from insa); </p>
+<p>-- 입사월별 인원수 구하기(월, 인원수), 월 오름차순 <br>
+  select to_char(ibsadate, 'mm') 월, count(*) 인원수 <br>
+  from insa <br>
+  group by to_char(ibsadate, 'mm') <br>
+  order by 월 ; </p>
+<p>select to_number(to_char(ibsadate, 'mm')) || '월' as 월, <br>
+  count(*)||'명' 인원수 <br>
+  from insa <br>
+  group by to_char(ibsadate, 'mm') <br>
+  order by to_char(ibsadate, 'mm'); </p>
+<p>-- rollup : 그룹화 하고 그룹에 대한 부분합<a name="36"></a><br>
+  select buseo, jikwi, sum(basicpay) from insa <br>
+group by rollup(buseo, jikwi); </p>
+<p>-- cube(rollup 결과에 group by 절의 조건에 따라 모든 가능한<a name="37"></a><br>
+  -- 그룹핑 조합에 따른 결과 출력 <br>
+  select buseo, jikwi, sum(basicpay) from insa <br>
+group by cube(buseo, jikwi); </p>
+<p>-- grouping 함수<a name="38"></a><br>
+grouping 함수는 rollup이나 cube 연산자와 함께 사용하여 grouping 함수에 기술된 컬럼이<br>
+그룹핑 시 즉, rollup이나 cube 연산 시 사용이 되었는지를 보여 주는 함수 </p>
+<p>select buseo, jikwi, grouping(buseo), grouping(jikwi), avg(basicpay) as 평균급여 <br>
+  from insa group by rollup (buseo, jikwi); </p>
+<p>select buseo, jikwi, grouping(buseo), grouping(jikwi), avg(basicpay) as 평균급여 <br>
+  from insa group by cube (buseo, jikwi); </p>
+<p>-- grouping sets 함수<a name="39" id="39"></a><br>
+grouping sets 함수는 group by 절에서 그룹 조건을 여러 개 지정할 수 있는 함수이다. <br>
+grouping sets 함수의 결과는 각 그룹 조건에 대해 별도로 group by한 결과를 union all한 결과와 동일하다. </p>
+<p>select buseo , jikwi, null, avg(basicpay) from insa group by buseo , jikwi <br>
+  union all <br>
+  select null, jikwi, city, avg(basicpay) from insa group by jikwi, city; </p>
+<p>select buseo , jikwi, city, avg(basicpay) from insa <br>
+  group by grouping sets ((buseo , jikwi), (jikwi, city)); </p>
+<p>-- rownum : 쿼리의 결과로 나오는 각각의 행들에 대한 순서 값을 나타내는 의사 컬럼<a name="310" id="310"></a><br>
+select rownum, insa.name, basicpay from insa; </p>
+<p>select rownum, name, basicpay from insa <br>
+  order by basicpay desc; -- 사용하면 안됨..왜?? </p>
+<p>select rownum, data.* from ( <br>
+  select name, basicpay from insa <br>
+  order by basicpay desc) data; </p>
+<p>select rownum, data.* from ( <br>
+  select name, basicpay from insa <br>
+  order by basicpay desc) data <br>
+  where rownum &gt;=10 and rownum &lt;=15; -- 안됨 </p>
+<p>select * from ( <br>
+  select rownum rnum, data.* from ( <br>
+  select name, basicpay from insa <br>
+  order by basicpay desc) data <br>
+  ) where rnum &gt;=10 and rnum &lt;=15; </p>
+<p><br>
+  -- 분석 함수<br>
+  -- rank() over( )<a name="311" id="311"></a><br>
+  -- 그룹 내에서 위치(순위)를 반환한다. <br>
+  -- over : 순위를 부여하기 위한 집합의 정렬 기준과 분할 기준의 정의 <br>
+  -- partition by : value expression1을 기준으로 분할, 생략하면 전체 집합을 대상으로 순위부여 <br>
+  -- order by : 각 분할 내에서 데이터를 정렬하는 기준 컬럼 지정 <br>
+  -- nulls first | nulls last : 정렬 결과에서 null 값의 위치 지정 </p>
+<p>select name, basicpay, <br>
+  rank() over(order by basicpay desc) 순위 <br>
+  from insa; </p>
+<p>select name, basicpay, sudang, <br>
+  rank() over(order by basicpay desc, sudang desc) 순위 <br>
+  from insa; </p>
+<p>select name, basicpay, buseo, <br>
+  rank() over(partition by buseo <br>
+  order by basicpay desc) 순위 <br>
+  from insa; </p>
+<p>-- 1~10등까지 출력(이름, 기본급, 순위) <br>
+  select * from ( <br>
+  select name, basicpay, <br>
+  rank() over(order by basicpay desc) as r <br>
+  from insa) where r &gt;= 1 and r &lt;= 10; </p>
+<p>select * from ( <br>
+  select name, basicpay from insa <br>
+  order by basicpay desc <br>
+  ) where rownum &lt;=10; -- 안됨 </p>
+<p>-- 기본급 상위 10%만 출력(이름,기본급) <br>
+  select name, basicpay from ( <br>
+  select name, basicpay, <br>
+  rank() over(order by basicpay desc) r <br>
+  from insa <br>
+  ) where r &lt;= <br>
+  trunc((select count(*) from insa) * 0.1); </p>
+<p>-- 부서별 기본급이 가장 높은 사람 출력(이름 부서 직위 급여) <br>
+  select name, buseo, jikwi, basicpay from ( <br>
+  select name, buseo,basicpay, jikwi, <br>
+  rank() over(partition by buseo <br>
+  order by basicpay desc) r <br>
+  from insa) <br>
+  where r=1; </p>
+<p>select name, buseo, jikwi, pay from ( <br>
+  select name, buseo,basicpay+sudang as pay, jikwi, <br>
+  rank() over(partition by buseo <br>
+  order by basicpay+sudang desc) r <br>
+  from insa) <br>
+  where r=1; </p>
+<p>-- dense_rank() over( ) 함수<a name="312" id="312"></a><br>
+  -- k 함수와 동일하지만 동일한 순위가 발생할 경우 연속적으로 순위를 부여한다. <br>
+  -- 예를 들어 "100, 100, 90"의 순위를 desc 순으로 rank 함수로 부여하면 "1, 1, 3"이 되지만 <br>
+-- dense_rank 함수는 "1, 1, 2"가 된다. </p>
+<p>-- row_number() over( ) 함수<a name="313" id="313"></a><br>
+  -- 분할별로 정렬된 결과에 대해 순위를 부여하는 기능이다. 분할은 전체 행을 특정 컬럼을 기준으로 <br>
+  -- 분리하는 기능으로 group by 절에서 그룹화 하는 방법과 같은 개념이다. <br>
+-- 동일한 값이 있는 경우 rank 함수는 1, 1, 3 형식으로 출력하지만 row_number는 1, 2, 3 순으로 출력 </p>
+<p>select name, basicpay, <br>
+  row_number() over(order by basicpay desc) from insa; </p>
+<p>-- count() over()<a name="314" id="314"></a><br>
+조건에 만족하는 행의 수 반환 </p>
+<p>-- 개발부 직원 중 이름, 기본급을 출력하고 각 직원의 급여보다 같거나 적게 받는 사람의 인원수를 출력 <br>
+  select name, basicpay, <br>
+  count(*) over(order by basicpay) <br>
+  from insa <br>
+  where buseo='개발부'; </p>
+<p>select name, basicpay, <br>
+  count(*) over(order by basicpay desc) <br>
+  from insa <br>
+  where buseo='개발부'; </p>
+<p>-- sum() over()<a name="315" id="315"></a><br>
+조건에 만족하는 행의 합 반환 </p>
+<p>select name, buseo, jikwi, basicpay, <br>
+  sum(basicpay) over(order by buseo, jikwi), <br>
+  sum(basicpay) over(partition by buseo <br>
+  order by jikwi) <br>
+  from insa; </p>
+<p>-- avg() over()<a name="316" id="316"></a><br>
+조건에 만족하는 행의 평균 반환 </p>
+<p>select name, city, basicpay, <br>
+  basicpay - <br>
+  round(avg(basicpay) over(partition by city order by city)) <br>
+"도시평균과차이", <br>
+  basicpay - <br>
+  (select round(avg(basicpay)) from insa) <br>
+"전체평균과차이" <br>
+  from insa; </p>
+<p>-- first_value() over()<a name="317" id="317"></a><br>
+정렬된 값 중에서 첫 번째 값을 구한다. </p>
+<p>-- insa 테이블에서 전체 사원의 급여와, 각 부서의 최고 급여를 출력하고 비교하기 <br>
+  select name, buseo, basicpay, <br>
+  first_value(basicpay) over(partition by buseo order by basicpay desc) <br>
+  from insa; </p>
+<p>-- 이름, 기본급, 최대기본급과의 차이 <br>
+  select name,basicpay, <br>
+  first_value(basicpay) over(order by basicpay desc) - basicpay 차이 <br>
+  from insa; </p>
+<p>-- first와 last<a name="318" id="318"></a><br>
+  -- first와 last는 그 자체가 함수가 아니라 분석 함수에 사용되는 키워드이다. <br>
+-- 특정 그룹에 따라 최대값괴 최소값을 추출한다. </p>
+<p>-- 형식 <br>
+  -- 집계합수 keep (dense_rank first[last] order by expr [asc | desc]) <br>
+  -- over(partition by expr ...) </p>
+<p>-- 부서별 최대 급여를 받는 사람과 최대급여, 최소급여를 받는 사람과 최소 급여 출력 <br>
+  select buseo, <br>
+  max(num || ' ' || name) keep (dense_rank first order by basicpay desc) 최대급여이름, <br>
+  max(basicpay) 최대급여, <br>
+  min(num || ' ' || name) keep (dense_rank last order by basicpay desc) 최소급여이름, <br>
+  min(basicpay) 최소급여 <br>
+  from insa <br>
+  group by busdeo; </p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><strong>4. 테이블작성/수정/삭제<a name="41"></a></strong></p>
+<p>-- 데이터 딕셔너리(data dictionary) : table과 view들의 집합으로 database에 <br>
+  -- 대한 정보를 제공하는 중요한 부분으로 database 생성시 sys schema 안의 <br>
+  -- 내부 table로 구성 </p>
+<p>select count(*) from dictionary; <br>
+  select count(*) from user_tables; <br>
+  select count(*) from tabs; <br>
+  select * from tabs; -- user_tables 와 동일 <br>
+  select * from tab; </p>
+<p>-- 컬럼명만 확인<a name="42"></a><br>
+select cname from col where tname='insa'; </p>
+<p>-- 컬럼명 및 자료형등 출력<a name="43"></a><br>
+  select column_name, data_type, data_length,data_precision from user_tab_columns where table_name='insa'; <br>
+select column_name, data_type, data_length,data_precision from cols where table_name='insa'; </p>
+<p>-- 제약조건 확인<a name="44"></a><br>
+select * from user_constraints where table_name='insa'; </p>
+<p>select constraint_name, table_name, constraint_type from user_constraints; </p>
+<p>-- 사용자에게 주어진 권한<a name="45"></a><br>
+select * from user_sys_privs; </p>
+<p>-- 자료형<a name="46"></a><br>
+  -- 문자 데이터 타입<a name="47"></a><br>
+  -- char(n) : 고정길이 문자 데이터를 저장하며 최대 길이는 2000자이고 길이를 명시하지 않으면 기본 길이는 1 <br>
+-- nls(국가별 언어 집합)는 한글과 영문만 가능 하다. 남은 공간은 공백(space)로 채운다. </p>
+<p>-- varchar2(n) : 가변 길이 문자 데이터를 저장하며 최대 길이는 4000자이고, 반드시 길이를 명시해야 한다. <br>
+  -- nls(국가별 언어 집합)는 한글과 영문만 가능하다. <br>
+  -- varchar 는 최대 2000개 문자를 저장하며 varchar2와는 다르게 varchar(10)로 선언하면 <br>
+  -- null을 채워 실제로는 10개의 공간을 사용한다. 하지만 varchar2(10)는 필요한 문자까지만 저장하는 <br>
+  -- variable length이며 최대 4000개 문자까지 저장할 수 있다. </p>
+<p>-- nchar, nvarchar2 : 다양한 언어의 문자 값(국가별 언어 집합 : nls)을 저장하고 조회할 수 있다. <br>
+  -- 바이트 단위가 아닌 문자 단위로 컬럼 길이를 지정한다. 예를 들어 nchar(7) 는 한문자가 <br>
+  -- 2byte인 경우 14byte가 사용된다. </p>
+<p>-- 숫자 데이터 타입<a name="48"></a><br>
+  -- number(p, s) : p(1~38)는 정밀도로 전체 자리수를 나타내며 기본 값이 38이고 s(-84~127)는 <br>
+  -- 소수점 이하의 자릿수이다. 정수나 실수 저장하기 위한 가변길이의 표준 내부 형식이다. <br>
+  -- 사용 예 <br>
+  -- number : number(38, 0)과 동일 <br>
+  -- number(5) : 다섯 자리 정수 <br>
+-- number(10, 3) : 1234567.6789 입력 시 1234567.679가 저장되며 12345678.678 입력 시 overflow 에러가 발생 한다. </p>
+<p>-- 날짜 데이터 타입<a name="49"></a><br>
+-- date : 『년/월/일 시:분:초』까지 저장하며, 기본적으로 년/월/일 정보를 출력한다. </p>
+<p>  -- 테이블 작성<a name="410"></a><br>
+  -- 아이디 숫자 7 <br>
+  -- 이름 문자 20 <br>
+  -- 나이 숫자 3 <br>
+-- 전화번호 문자 25 (우편번호, 학번 .. : 문자) </p>
+<p>-- 테이블 작성 <br>
+  create table test1 ( <br>
+  id number(7) <br>
+  , name varchar2(20) <br>
+  , age number(3) <br>
+  , tel varchar2(25) <br>
+  ); </p>
+<p>-- 테이블 목록 확인<a name="411"></a><br>
+  select * from tab; <br>
+select table_name from tabs; </p>
+<p>-- 테이블 구조 확인<a name="412"></a><br>
+desc test1; </p>
+<p>-- 테이블에 필드 추가<a name="413"></a><br>
+alter table 테이블이름 add (컬럼명 datatype [default 값] [, 컬럼명 datatype]...); </p>
+<p>alter table test1 add (birth date, bigo varchar2(255)); <br>
+  desc test1; </p>
+<p>-- 테이블의 컬럼폭 및 자료형 변경<a name="414"></a><br>
+alter table 테이블명 modify (컬럼명 datatype [default 값] [, 컬럼명 datatype]...); </p>
+<p>alter table test1 modify (bigo varchar2(200)); <br>
+  desc test1; </p>
+<p>-- 테이블의 필드명 변경<a name="415"></a><br>
+alter table 테이블명 rename column 변경전컬럼명 to 새로운컬럼명; </p>
+<p>alter table test1 rename column bigo to memo <br>
+  desc test1; </p>
+<p>-- 테이블의 필드 삭제<a name="416"></a><br>
+alter table 테이블명 drop column 컬럼명; </p>
+<p>alter table test1 drop column age; <br>
+  desc test1; </p>
+<p>-- 테이블명 변경 : 테이블, 뷰, 시퀀스, 시너님의 이름을 변경<a name="417"></a><br>
+rename old_name to new_name; </p>
+<p>rename test1 to exam1; <br>
+  select * from tab; </p>
+<p>-- 기존 테이블을 이용하여 테이블 작성<a name="418"></a><br>
+create table 테이블명 [컬럼명 (, 컬럼명) ,...] as subquery; </p>
+<p>create table insa1 as select num, name, basicpay, <br>
+  sudang, basicpay+sudang pay from insa; </p>
+<p>select * from tab; <br>
+  desc insa1 <br>
+  select * from insa1; </p>
+<p>-- 테이블 구조만 복사(제약조건은 복사 되지 않는다)<a name="419"></a><br>
+create table insa2 as select * from insa where 1=0; </p>
+<p>-- 테이블 삭제<a name="420"></a><br>
+drop table 테이블명 [cascade constraints] [purge]; </p>
+<p>-- 휴지통<a name="421"></a><br>
+  drop table insa1; -- 휴지통에 삭제된 테이블 저장 <br>
+select * from tab; </p>
+<p>-- 휴지통 확인<a name="422"></a><br>
+  select object_name, original_name, droptime, dropscn <br>
+from recyclebin; </p>
+<p>-- 휴지통 테이블 내용 확인(휴지통 정보 확인 후 object_name 명으로 확인)<a name="423"></a><br>
+select * from "bin$lmg0n7nosncafq8lkjzm2q==$0" ; </p>
+<p>-- 휴지통 복원(insa1 은 삭제하기 전의 원래 테이블명)<a name="424"></a><br>
+  flashback table insa1 to before drop; <br>
+select * from tab; </p>
+<p>-- 휴지통 복원(bin 이름(object_name)으로 되돌리기)<a name="425"></a><br>
+  flashback table "bin$lmg0n7nosncafq8lkjzm2q==$0" <br>
+to before drop; </p>
+<p>-- 휴지통 비우기<a name="426"></a><br>
+  drop table insa2; <br>
+  purge recyclebin; <br>
+select * from tab; </p>
+<p>-- 휴지통에 버리지 않고 바로 테이블 삭제<a name="427"></a><br>
+  drop table insa1 purge; <br>
+select * from tab; </p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><strong>5. 자료 추가/수정/삭제<a name="51"></a></strong></p>
+<p>-- 테이블에 데이터 추가<a name="52"></a><br>
+  -- insert into 테이블명 [(컬럼명1, 컬럼명2, ...)] values (값1, 값2, ...) <br>
+-- 한개의 테이블에 하나의 행만 추가 할 수 있다. </p>
+<p>select * from tab; <br>
+  drop table test1 purge; <br>
+  drop table insa1 purge; <br>
+  drop table insa2 purge; </p>
+<p>create table test1 ( <br>
+  num number(7) primary key <br>
+  ,name varchar2(20) not null <br>
+  ,birth date not null <br>
+  ,memo varchar2(255) <br>
+  ); </p>
+<p>insert into test1 values (1, '홍길동', '2000-10-10', '테스트'); <br>
+  insert into test1 (num, name, birth, memo) <br>
+  values (2, '이순신', '1999-01-01', '충무공'); <br>
+  insert into test1 values (3, '오라클', '1999-12-12'); --오류(필드개수와 값의 개수가 달라서) <br>
+  insert into test1 values (3, '오라클', '1999-12-12', null); <br>
+  insert into test1 (num, name, birth) values (4, '소녀시대', '1988-01-01'); </p>
+<p>select * from test1; </p>
+<p>commit; -- 트랜잭션완료(데이터베이스에 저장) <br>
+  rollback; -- 트랜잭션취소(데이터베이스에 저장되지 않음) </p>
+<p>insert into test1 values (1, '호호호', '1999-10-10', '테스트'); <br>
+  -- 오류(제약조건 위반, 기본키는 중복을 허용하지 않는다.) </p>
+<p>insert into test1 (num, name, memo) values (5, '이순신', '충무공'); <br>
+  -- 오류(birth는 not null 속성을 가지고 있는데 birth를 입력하지 않았으므로) </p>
+<p>insert into test1 (num, name, memo, birth) values (5, '이순신', '충무공', '05/05/88'); <br>
+  -- 오류(날짜 형식이 맞지 않아서) </p>
+<p>insert into test1 (num, name, memo, birth) <br>
+  values (5, '이순신', '충무공', <br>
+  to_date('05/05/88', 'mm/dd/yy')); <br>
+  -- yy는 시스템시간을 기준으로하므로 2088 출력 <br>
+  commit; </p>
+<p>-- 아래처럼 해야 1988 <br>
+  insert into test1 (num, name, memo, birth) <br>
+  values (6, '이순신', '충무공', <br>
+  to_date('05/05/88', 'mm/dd/rr')); <br>
+  commit; <br>
+  select * from test1 </p>
+<p>-- 여러행 추가 <br>
+  insert into 테이블명 [(컬럼명, 컬럼명, ...)] subquery; </p>
+<p>create table test2 as select num, name, birth from test1 where 1=0;<a name="53"></a><br>
+  -- 구조만복사(제약 조건은 복사 되지 않음) <br>
+desc test2 -- 확인 </p>
+<p>-- 제약조건 확인<a name="54"></a><br>
+select constraint_name, table_name, constraint_type from user_constraints; </p>
+<p>-- 여러행 추가(기존 테이블의 자료를 추가)<a name="55"></a><br>
+  insert into test2 select num, name, birth from test1; <br>
+  commit; <br>
+select * from test2; </p>
+<p>insert into test2(name, birth) <br>
+  select name, birth from test1; <br>
+  commit; <br>
+  select * from test2; </p>
+<p>-- 하나의 insert문을 이용 여러 테이블에 데이터 추가<a name="56"></a><br>
+  insert all | first <br>
+  [into 테이블_1 values (컬럼_1, 컬럼_2,...)] <br>
+  [into 테이블_2 values (컬럼_1, 컬럼_2,...)] <br>
+  ....... <br>
+subquery; </p>
+<p>-- all : 서브 쿼리의 결과 집합을 해당하는 insert 절에 모두 입력 <br>
+  -- first : 서브 쿼리의 결과 집합을 해당하는 첫 번째 insert 절에 입력 </p>
+<p>create table test3 as select * from test1 where 1=0; <br>
+  create table test4 as select * from test1 where 1=0; </p>
+<p>insert all <br>
+  into test3 values(num, name, memo, birth) <br>
+  into test4 (num, name) values (num, name) <br>
+  select * from test1; <br>
+  commit; </p>
+<p>select * from test3; <br>
+  select * from test4; </p>
+<p>-- 조건에 만족하는 자료만 여러 테이블에 추가<a name="57"></a><br>
+  insert all <br>
+  when 조건절_1 then <br>
+  into [테이블_1] values (컬럼_1, 컬럼_2, ...) <br>
+  when 조건절_2 then <br>
+  into [테이블_2] values (컬럼_1, 컬럼_2, ...) <br>
+  ........ <br>
+  else <br>
+  into [테이블_3] values (컬럼_1, 컬럼_2, ...) <br>
+subquery; </p>
+<p>create table test5 as select * from test1 where 1=0; <br>
+  create table test6 as select * from test1 where 1=0; </p>
+<p>insert all <br>
+  when num &gt;3 then <br>
+  into test5 values(num, name, memo, birth) <br>
+  when num &lt;=3 then <br>
+  into test6 (num, name) values (num, name) <br>
+  select * from test1; <br>
+  commit; </p>
+<p>select * from test5; <br>
+  select * from test6; </p>
+<p>-- 수정<a name="58"></a><br>
+-- update 테이블명 set 컬럼명= 변경할값[, 컬럼명= 변경할값, ...] [where 조건]; </p>
+<p>select * from test1; </p>
+<p>update test1 set birth='2010-10-10', memo='수정'; <br>
+  -- 절대로 이렇게 하면 안된다. 이렇게 수정하면 쫓겨난다.(전체가 다 수정되므로) <br>
+  -- where조건 추가해야 한다. <br>
+  select * from test1; <br>
+  rollback; </p>
+<p>update test1 set birth='2010-10-10', memo='수정' <br>
+  where num=1; <br>
+  commit; <br>
+  select * from test1; </p>
+<p>update test1 set num=111 where num=1; <br>
+  -- 기본키는 nc 속성을 갖지 않는다. 즉 변경 가능 하다. <br>
+  commit; <br>
+  select * from test1; </p>
+<p>update test1 set num=2 where num=111; <br>
+  -- 오류(기본키 중복) </p>
+<p>create table score ( <br>
+  num number(7) primary key <br>
+  ,name varchar2(20) not null <br>
+  ,com number(3) <br>
+  ,excel number(3) <br>
+  ,word number(3) <br>
+  ); </p>
+<p>insert into score(num, name) <br>
+  select num, name from insa where num&lt;=1007; <br>
+  commit; </p>
+<p>select * from score; </p>
+<p>update score set com=35, excel=95, word=100 where num=1001; <br>
+  update score set com=85, excel=80, word=80 where num=1002; <br>
+  update score set com=45, excel=65, word=55 where num=1003; <br>
+  update score set com=75, excel=75, word=60 where num=1004; <br>
+  update score set com=85, excel=85, word=80 where num=1005; <br>
+  update score set com=85, excel=65, word=85 where num=1006; <br>
+  update score set com=65, excel=90, word=80 where num=1007; <br>
+  commit; </p>
+<p>select num, name, com, excel, word, com+excel+word as tot, <br>
+  round((com+excel+word)/3, 1) as ave, <br>
+  case <br>
+  when com&gt;=40 and excel&gt;=40 and word&gt;=40 and <br>
+  (com+excel+word)/3 &gt;= 60 then '합격' <br>
+  when (com+excel+word)/3 &lt; 60 then '불합격' <br>
+  else '과락' <br>
+  end as pan <br>
+  from score; </p>
+<p>-- 여자의 excel 점수에 + 5(insa 테이블 참조) <br>
+  update score set excel=excel+5 <br>
+  where num in (select num from insa <br>
+  where substr(ssn, 8, 1) in (2, 4)); <br>
+  commit; </p>
+<p>-- 자료 삭제<a name="59"></a><br>
+delete [from] 테이블명 [where 조건]; </p>
+<p>select * from tab; <br>
+  select * from test1; </p>
+<p>-- 모든 자료 삭제(테이블 구조는 지워지지 않는다.)<a name="510"></a><br>
+  delete from test1; <br>
+  commit; <br>
+  select * from test1; <br>
+drop table test1 purge; </p>
+<p>-- 조건에 만족하는 데이터 삭제<a name="511"></a><br>
+  select * from test2; <br>
+  delete from test2 where num=1; -- from은 생략 가능 <br>
+  commit; <br>
+select * from test2; </p>
+<p>-- 모든 자료 삭제 <a name="512"></a><br>
+  truncate table test2; <br>
+  -- 모든 자료를 삭제하는 경우 delete보다 빠름 <br>
+  -- rollback 불가(자동 commit) </p>
+<p>select * from test2; <br>
+  drop table test2 purge </p>
+<p>-- score 테이블의 여자만 삭제<a name="513"></a><br>
+  select * from score; <br>
+  delete from score where num in <br>
+  (select num from insa where substr(ssn, 8, 1) in (2, 4)); <br>
+  select * from score; <br>
+commit; </p>
+<p>select * from tab; </p>
+<p>drop table test2 purge; <br>
+  drop table test3 purge; <br>
+  drop table test4 purge; <br>
+  drop table test5 purge; <br>
+  drop table test6 purge; </p>
+<p>select * from tab; </p>
+<p>-- merge(병합)<a name="514"></a><br>
+  merge into 테이블_명 별칭 <br>
+  using 대상테이블/뷰 별칭 <br>
+  on 조인조건 <br>
+  when matched then <br>
+  update set <br>
+  컬럼_1=값_1 <br>
+  ,컬럼_2=값_2 <br>
+  when not matched then <br>
+  insert (컬럼_1, 컬럼_2, ...) <br>
+values(값_1, 값_2, ...); </p>
+<p>create table test1( <br>
+  id number primary key <br>
+  ,name varchar2(20) <br>
+  ,pay number <br>
+  ,sudang number <br>
+  ); </p>
+<p>create table test2( <br>
+  id number primary key <br>
+  ,sudang number <br>
+  ); </p>
+<p>insert into test1(id, name, pay, sudang) values <br>
+  (1, 'a', 100, 10); <br>
+  insert into test1(id, name, pay, sudang) values <br>
+  (2, 'b', 150, 20); <br>
+  insert into test1(id, name, pay, sudang) values <br>
+  (3, 'c', 130, 0); </p>
+<p>insert into test2(id, sudang) values (2, 5); <br>
+  insert into test2(id, sudang) values (3, 15); <br>
+  insert into test2(id, sudang) values (4, 10); <br>
+  commit; </p>
+<p>merge into test2 s <br>
+  using (select id, sudang from test1) t <br>
+  on (s.id = t.id) <br>
+  when matched then <br>
+  update set s.sudang=s.sudang+t.sudang <br>
+  when not matched then <br>
+  insert (s.id, s.sudang) values (t.id, t.sudang); </p>
+<p>select * from test1; <br>
+  select * from test2; </p>
+<p>merge into test2 s <br>
+  using test1 t <br>
+  on (s.id = t.id) <br>
+  when matched then <br>
+  update set s.sudang=s.sudang+t.sudang <br>
+  when not matched then <br>
+  insert (s.id, s.sudang) values (t.id, t.sudang); </p>
+<p>drop table test1 purge; <br>
+  drop table test2 purge;</p>
+<p>&nbsp;</p>
+<p>&nbsp; </p>
+<p><strong>6. 제약조건</strong></p>
+<p>-- 제약조건 확인<a name="61"></a><br>
+desc user_constraints; -- user_constraints 구조 확인 </p>
+<p>select * from user_constraints where table_name='insa'; -- 어떤 컬럼에 제약조건이 부여되었는지 확인 불가 <br>
+  -- p : 기본키, c : not null 등, u : unique, r : 참조키 등 </p>
+<p>select constraint_name, table_name, constraint_type from user_constraints; </p>
+<p>-- 현재 user가 가지고 있는 column에 할당된 제약조건에 대한 정보 <br>
+  select * from user_cons_columns; -- 어떤 컬럼에 기본키가 부여되었는지 확인 가능 </p>
+<p>-- 개체 무결성(primary key, unique)<a name="62"></a><br>
+릴레이션에 저장되는 튜플(tuple)의 유일성을 보장하기 위한 제약조건 </p>
+<p>-- 참조 무결성(foreign key)<a name="63"></a><br>
+참조 무결성은 릴레이션 간의 데이터의 일관성을 보장하기 위한 제약조건이다 </p>
+<p>-- 컬럼 레벨 기본키 지정<a name="64"></a><br>
+컬럼 정의 시 해당 컬럼별로 지정하는 무결성 제약조건이다. </p>
+<p>create table 테이블명 ( <br>
+  컬럼명 데이터타입 [constraint 제약조건명] primary key <br>
+  ); </p>
+<p>create table test1 ( <br>
+  id number primary key <br>
+  ,name varchar2(20) <br>
+  ,tel varchar2(25) <br>
+  ); </p>
+<p>-- 제약 조건 확인 <br>
+  select constraint_name, table_name, r_constraint_name, constraint_type, search_condition <br>
+  from user_constraints; </p>
+<p>-- 현재 user가 가지고 있는 column에 할당된 제약조건에 대한 정보 <br>
+  select * from user_cons_columns; </p>
+<p>-- 제약 조건 이름 부여 <a name="65"></a><br>
+  create table test2 ( <br>
+  id number constraint pk_test2_id primary key <br>
+  ,name varchar2(20) <br>
+  ,tel varchar2(25) <br>
+  ); </p>
+<p>select constraint_name, table_name, r_constraint_name, constraint_type, search_condition <br>
+  from user_constraints; </p>
+<p>-- 테이블 레벨 기본키 <br>
+  하나 이상의 컬럼을 참조하거나 하나의 컬럼에 두 개 이상의 제약조건을 지정하는 경우 사용한다. </p>
+<p>create table 테이블명 ( <br>
+  컬럼명 데이터타입 <br>
+  ,constraint 제약조건명 primary key(컬럼명 [,컬럼명]) <br>
+  ); </p>
+<p>create table test3 ( <br>
+  id number <br>
+  ,name varchar2(20) <br>
+  ,tel varchar2(25) <br>
+  ,constraint pk_test3_id primary key (id) <br>
+  ); </p>
+<p>create table test4 ( <br>
+  id number(4) <br>
+  ,code varchar2(4) <br>
+  ,name varchar2(20) <br>
+  ,constraint pk_test4_id primary key (id, code) <br>
+  ); </p>
+<p>select constraint_name, table_name, r_constraint_name, constraint_type, search_condition <br>
+  from user_constraints; </p>
+<p>-- 자료 입력<br>
+  insert into test4(id, code, name) values (1, '1111', 'a'); <br>
+  insert into test4(id, code, name) values (1, '2222', 'b'); <br>
+  insert into test4(id, code, name) values (1, '2222', 'c'); <br>
+  -- 오류 : 제약조건 위반 <br>
+  insert into test4(id, code, name) values (1, null, 'c'); <br>
+  -- 오류 : 기본키는 null이 될수 없다. <br>
+commit; </p>
+<p>select * from test4; </p>
+<p>-- 기본키 삭제<a name="66"></a><br>
+  alter table 테이블명 drop primary key; <br>
+alter table 테이블명 drop constraint 제약조건이름; </p>
+<p>alter table test4 drop primary key; </p>
+<p>select constraint_name, table_name, r_constraint_name, constraint_type, search_condition <br>
+  from user_constraints; <br>
+  where table_name='TEST4'; -- 조건은 대소문자 비교 </p>
+<p>-- 이미 존재하는 테이블에 기본키 추가<a name="67"></a><br>
+alter table 테이블명 add constraint 제약조건이름 primary key(필드[, 필드]); </p>
+<p>alter table test4 add constraint pk_test4_id primary key(id); <br>
+  -- 오류 : test4 테이블의 id에 유일성을 위반하는 데이터가 있으므로 </p>
+<p>alter table test4 add constraint pk_test4_id primary key(id, code); </p>
+<p>-- unique<a name="68"></a><br>
+  -- 테이블에서 지정한 컬럼의 데이터가 중복되지 않고 유일하다. <br>
+-- null을 허용할 경우 null은 중복이 가능하다. </p>
+<p>-- 컬럼 레벨<a name="69"></a><br>
+  create table 테이블명 ( <br>
+  컬럼명 데이터타입 constraint 제약조건명 unique <br>
+); </p>
+<p>-- 테이블 레벨<a name="610"></a><br>
+  create table 테이블명 ( <br>
+  컬럼명 데이터타입 <br>
+  ,constraint 제약조건명 unique(컬럼명) <br>
+); </p>
+<p>create table test5( <br>
+  id number not null <br>
+  ,ssn varchar2(14) <br>
+  -- ,ssn varchar2(14) constraint uk_test5_ssn unique <br>
+  ,tel varchar2(20) <br>
+  ,constraint pk_test5_id primary key (id) <br>
+  ,constraint uk_test5_ssn unique (ssn) <br>
+  ); </p>
+<p>select constraint_name, table_name, r_constraint_name, constraint_type, search_condition <br>
+  from user_constraints; </p>
+<p>insert into test5 (id) values (1); <br>
+  -- ssn이 not null이 아니므로 null 허용 <br>
+  insert into test5 (id) values (2); <br>
+  -- unique에서 null은 중복 허용 <br>
+  insert into test5 (id, ssn) values (3, '1'); <br>
+  insert into test5 (id, ssn) values (4, '1'); <br>
+  -- 오류 : ssn이 중복적인 데이터 이므로 <br>
+  commit; </p>
+<p>select * from test5; </p>
+<p>	<br>
+  -- 컬럼 레벨 <br>
+  create table 테이블명 ( <br>
+  컬럼명 데이터타입 constraint 제약조건명 check(조건) <br>
+  ); <br>
+  create table 테이블명 ( <br>
+  컬럼명 데이터타입 check(조건) <br>
+  ); </p>
+<p>-- 테이블 레벨 <br>
+  create table 테이블명 ( <br>
+  컬럼명 데이터타입 <br>
+  ,constraint 제약조건명 check(조건) <br>
+  ); </p>
+<p>-- gender 컬럼에 남자와 여자만 입력을 허용 할 경우 <br>
+  gender varchar2(4) check(gender check(gender in ('남자', '여자')) </p>
+<p>-- score 컬럼에 0~100 점만 입력을 허용 할 경우 <br>
+  score number(3) check (score between 0 and 100) </p>
+<p>-- 컬럼 레벨 <br>
+  create table test2 ( <br>
+  id number <br>
+  ,name varchar2(20) <br>
+  ,score number(3) check (score between 0 and 100) <br>
+  ,constraint pk_test2_id primary key(id) <br>
+  ); </p>
+<p>또는 <br>
+  -- 테이블 레벨 <br>
+  create table test2 ( <br>
+  id number <br>
+  ,name varchar2(20) <br>
+  ,score number(3) <br>
+  ,constraint pk_test2_id primary key(id) <br>
+  ,constraint ck_test2_score <br>
+  check (score between 0 and 100) <br>
+  ); </p>
+<p>또는 <br>
+  -- 컬럼 레벨(제약조건명 지정) <br>
+  create table test2 ( <br>
+  id number <br>
+  ,name varchar2(20) <br>
+  ,score number(3) constraint ck_test2_score <br>
+  check (score between 0 and 100) <br>
+  ,constraint pk_test2_id primary key(id) <br>
+  ); </p>
+<p>select constraint_name, table_name, <br>
+  constraint_type, search_condition <br>
+  from user_constraints; </p>
+<p>-- 존재하는 필드에 check 제약 추가<a name="611"></a><br>
+alter table 테이블명 add constraint 제약조건명 check (조건); </p>
+<p>alter table test1 add constraint ck_test1_score <br>
+  check (score between 0 and 100); </p>
+<p>-- 제약 조건 확인 <br>
+  select constraint_name, table_name, r_constraint_name, constraint_type, search_condition <br>
+  from user_constraints; </p>
+<p>insert into test1 (id, ssn, name, score) <br>
+  values (4, '888', 'bbb', 80); <br>
+  commit; </p>
+<p>insert into test1 (id, ssn, name, score) <br>
+  values (5, '999', 'hhh', 101); <br>
+  -- 오류 : check 제약 위반 </p>
+<p>-- not null 추가<a name="612"></a><br>
+-- 테이블에서 지정한 컬럼의 데이터가 null(또는 '') 값을 갖지 못한다. ' ' 처럼 공백이 있는 경우는 null이 아니다. </p>
+<p>-- 테이블 생성시 <br>
+  create table 테이블명 ( <br>
+  필드명 자료형 not null, <br>
+  ); </p>
+<p>-- 존재하는 테이블에 not null 추가<a name="613"></a><br>
+  alter table test2 modify 컬럼명 not null; <br>
+  alter table test2 modify (컬럼명 자료형 not null); <br>
+alter table 테이블명 constraint 제약조건명 check(컬럼명 is not null); </p>
+<p>alter table test2 modify name not null; <br>
+  또는 <br>
+  alter table test2 modify (name varchar2(20) not null); </p>
+<p>-- default(초기값)<a name="614"></a><br>
+  -- insert할 때 값을 입력하지 않은 경우 default에서 설정한 값으로 입력 <br>
+-- insert와 update 문에서 특정 값이 아닌 디폴트값을 입력할 수 도 있다. </p>
+<p>create table 테이블명 ( <br>
+  필드명 자료형 default 값, <br>
+  ); </p>
+<p>create table ex1( <br>
+  no number(6) not null <br>
+  ,sal number(8, 2) <br>
+  ,nowdate date default sysdate <br>
+  ); </p>
+<p>insert into ex1 values(1111, 30000, ''); <br>
+  insert into ex1 values(2222, 40000, default); <br>
+  insert into ex1 (no, sal) values (2222, 40000); <br>
+  commit; <br>
+  select * from ex1; </p>
+<p>update ex1 set nowdate=default where no=1111; </p>
+<p>select * from ex1; </p>
+<p>-- default 제거<a name="615"></a><br>
+alter table 테이블명 modify 컬럼명 default null; </p>
+<p>alter table ex1 modify nowdate default null; </p>
+<p>-- 확인 <br>
+  select column_name, data_type, data_precision, data_length, nullable, data_default <br>
+  from user_tab_columns where table_name='ex1'; </p>
+<p>-- 테이블 삭제 <br>
+  drop table ex1 purge; </p>
+<p>-- 제약조건 제거<a name="616"></a><br>
+  select constraint_name, table_name, r_constraint_name, constraint_type, search_condition <br>
+from user_constraints; </p>
+<p>-- 기본키 제거<a name="617"></a><br>
+  alter table 테이블명 drop primary key; <br>
+alter table 테이블명 drop constraint 제약조건이름; </p>
+<p>-- not null 제거<a name="618"></a><br>
+  alter table 테이블명 modify 컬러명 null; <br>
+alter table 테이블명 drop constraint 제약조건이름; </p>
+<p>-- 기타 제약조건 제거<a name="619"></a><br>
+alter table 테이블명 drop constraint 제약조건이름; </p>
+<p>-- 참조(외래, foreign)키<a name="620"></a><br>
+  -- 두 테이블의 데이터 간 연결을 설정하고 강제 적용하는 데 사용되는 열이다. 한 테이블의 기본 키 값이 있는 열을 <br>
+  -- 다른 테이블에 추가하면 테이블 간 연결을 설정할 수 있다. 이 때 두 번째 테이블에 추가되는 열이 외래 키가 된다. <br>
+  -- 부모 테이블이 먼저 생성된 후 자식 테이블(foreign key를 포함하는 테이블)이 생성되어야 한다. <br>
+  -- foreign key는 부모 테이블의 primary key, unique만 참조할 수 있고, 컬럼의 값과 일치하거나 null 값이어야 한다. <br>
+  -- 부모테이블의 컬럼명과 자식테이블의 컬럼명은 일치하지 않아도 되지만 자료형은 일치해야 한다. <br>
+  -- 참조 무결성 제약조건에서 부모 테이블의 참조 키 컬럼에 존재하지 않는 값을 자식 테이블에 입력하면 오류가 발생한다. <br>
+-- on delete set null은 자식 테이블이 참조하는 부모 테이블의 값이 삭제되면 자식 테이블의 값을 null 값으로 변경시킨다. </p>
+<p>create table 테이블명 ( <br>
+  컬럼명 자료형 <br>
+  ,constraint 제약조건이름 foreign key(컬럼명 [,컬럼명]) <br>
+  references 참조할테이블(컬럼명 [,컬럼명]) <br>
+  [on delete cascade] <br>
+  ); </p>
+<p>create table exam1 ( <br>
+  code number primary key <br>
+  ,name varchar2(20) <br>
+  ); </p>
+<p>create table exam2 ( <br>
+  id number primary key <br>
+  ,name varchar2(100) <br>
+  ,code number <br>
+  ,constraint fk_exam2_code foreign key(code) <br>
+  references exam1(code) <br>
+  ); </p>
+<p>-- exam2(참조 테이블에 자료 먼저 추가) <br>
+  insert into exam2(id, name, code) values(1, '홍길동', 1); <br>
+  -- 오류(참조키 위반, 참조당하는 테이블에 없는 코드를 입력했으므로) </p>
+<p>-- exam1에 추가 <br>
+  insert into exam1(code, name) values(100, '신발'); <br>
+  insert into exam1(code, name) values(200, '가방'); </p>
+<p>insert into exam2(id, name, code) values(1, '홍길동', 100); <br>
+  insert into exam2(id, name, code) values(1, '홍길동', 100); -- 오류(기본키 중복) <br>
+  insert into exam2(id, name, code) values(2, '홍길동', 100); </p>
+<p>update exam1 set code=300 where code=100; <br>
+  -- 오류(100번이 참조 당하고 있으므로) </p>
+<p>update exam1 set code=400 where code=200; <br>
+  -- 참조당하고 있지 않으므로 수정 가능 </p>
+<p>delete from exam1 where code=100; <br>
+  -- 오류(exam2 테이블에서 100을 참조하고 있으므로) </p>
+<p>delete from exam1 where code=200; <br>
+  -- 삭제가능(exam2에서 참조하고 있는것이 없으므로) </p>
+<p>drop table exam1 purge; <br>
+  -- 삭제 불가(참조 당하고 있으므로) </p>
+<p>-- 참조키 삭제<a name="621"></a><br>
+alter table 테이블명 drop constraint 참조키제약조건명; </p>
+<p>alter table exam2 drop constraint fk_exam2_code; </p>
+<p>-- 존재하는 테이블에 참조키 추가<a name="622"></a><br>
+  alter table 테이블명 add <br>
+  constraint 제약조건명 foreign key(컬럼명[, 컬럼명]) <br>
+references 참조할테이블명(컬럼명[, 컬럼명]); </p>
+<p>alter table exam2 add <br>
+  constraint fk_exam2_code foreign key(code) <br>
+  references exam1(code); </p>
+<p>drop table exam2 purge; <br>
+  drop table exam1 purge; </p>
+<p>create table exam1 ( <br>
+  code number primary key <br>
+  ,name varchar2(20) <br>
+  ); </p>
+<p>create table exam2 ( <br>
+  id number primary key <br>
+  ,name varchar2(100) <br>
+  ,code number <br>
+  ,constraint fk_exam2_code foreign key(code) <br>
+  references exam1(code) <br>
+  on delete cascade <br>
+  ); </p>
+<p>insert into exam1(code, name) values (100, '신발'); <br>
+  insert into exam1(code, name) values (200, '가방'); <br>
+  insert into exam1(code, name) values (300, '옷'); </p>
+<p>insert into exam2(id, name, code) <br>
+  values(1, '홍길동', 100); <br>
+  insert into exam2(id, name, code) <br>
+  values(2, '이기자', 100); <br>
+  insert into exam2(id, name, code) <br>
+  values(3, '홍길동', 200); <br>
+  insert into exam2(id, name, code) <br>
+  values(4, '심심해', 100); </p>
+<p>select * from exam1; <br>
+  select * from exam2; </p>
+<p>-- 자료 삭제(exam1을 삭제하면 참조된 exam2 자료도 삭제) <br>
+  -- on delete cascade 때문에 <br>
+  delete from exam1 where code=100; <br>
+  select * from exam1; <br>
+  select * from exam2; </p>
+<p>drop table exam1; -- 오류 <br>
+  drop table exam1 cascade constraints; <br>
+  -- 테이블과 제약조건도 삭제 </p>
+<p>select * from tab; </p>
+<p>select * from exam2; -- 참조한 컬럼의 데이터는 null로 변경 </p>
+<p>select constraint_name, table_name, r_constraint_name, constraint_type, search_condition <br>
+  from user_constraints; </p>
+<p>drop table exam2 recyclebin; </p>
+<p>-- 제약 조건 활성화/비활성화<a name="623"></a><br>
+  create table exam1 ( <br>
+  id number primary key <br>
+  ,name varchar2(20) <br>
+); </p>
+<p>select constraint_name, table_name, status, <br>
+  constraint_type from user_constraints; </p>
+<p>-- 기본키 비활성화<a name="624"></a><br>
+alter table exam1 disable primary key cascade; </p>
+<p>select constraint_name, table_name, r_constraint_name, constraint_type, search_condition <br>
+  from user_constraints; </p>
+<p>-- name에 not null 제약설정<a name="625"></a><br>
+  alter table exam1 add constraint exam1_name_nn <br>
+check(name is not null); </p>
+<p>select constraint_name, table_name, r_constraint_name, constraint_type, search_condition <br>
+  from user_constraints; </p>
+<p>insert into exam1(id, name) values (1, null); <br>
+  -- 오류(name : not null) <br>
+  insert into exam1(id, name) values (1, '홍길동'); <br>
+  insert into exam1(id, name) values (1, '이순신'); <br>
+  -- 가능 : 기본키가 비활성화 된 상태이므로 중복 허용 </p>
+<p>-- not null 비활성화<a name="626"></a><br>
+alter table exam1 disable constraint exam1_name_nn cascade; </p>
+<p>select constraint_name, table_name, r_constraint_name, constraint_type, search_condition <br>
+  from user_constraints; </p>
+<p>insert into exam1(id, name) values (3, null); <br>
+  select * from exam1; </p>
+<p>-- 기본키활성화<a name="627"></a><br>
+  alter table exam1 enable constraint sys_c005440; <br>
+-- 오류 : 유일성을 위반하는 자료가 있으므로 </p>
+<p>delete from exam1 where name='이순신'; </p>
+<p>alter table exam1 enable constraint sys_c005440; <br>
+  -- 가능 : 유일성을 위반하는 자료가 없으므로 </p>
+<p>select constraint_name, table_name, r_constraint_name, constraint_type, search_condition <br>
+  from user_constraints; </p>
+<p>drop table exam1 purge; </p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><strong>7. 조인</strong></p>
+<p>-- equi 조인<a name="71"></a><br>
+  -- 두 개 이상의 테이블에 관계되는 컬럼들의 값들이 일치하는 경우에 사용하는 가장 일반적인 join 형태로 <br>
+  -- where 절에 '='(등호)를 사용한다. <br>
+-- equi join은 단순 join 또는 내부 join이라고도 한다. </p>
+<p>select * from book; <br>
+  select * from danga; </p>
+<p>-- 형식-1 <br>
+  select 테이블명1.컬럼명, 테이블명2.컬럼명 from 테이블명1, 테이블명2 [, 테이블명3 ] <br>
+  where 테이블명1.컬럼명1=테이블명2.컬럼명1 [and 조건]; </p>
+<p>select b.b_id, title, c_name, price <br>
+  from book b, danga d where b.b_id = d.b_id; </p>
+<p>-- 형식-2 <br>
+  select 테이블명1.컬럼명, 테이블명2.컬럼명 from 테이블명1 <br>
+  join 테이블명2 using (컬럼명1) <br>
+  join 테이블명3 using (컬럼명2); </p>
+<p>select b_id, title, c_name, price <br>
+  from book join danga using(b_id); </p>
+<p>-- 형식-3 <br>
+  select 테이블명1.컬럼명, 테이블명2.컬럼_명 from 테이블명1 <br>
+  join 테이블명2 on 테이블명1.컬럼명1=테이블명2.컬럼명1; </p>
+<p>select b.b_id, title, c_name, price <br>
+  from book b join danga d <br>
+  on b.b_id = d.b_id; </p>
+<p>-- 형식-4 <br>
+  select 테이블명1.컬럼명, 테이블명2.컬럼명 from 테이블명1 <br>
+  natural join 테이블명2; </p>
+<p>-- 만약 match되는 컬럼이 여러 개 일 경우, natural join에서는 특정 컬럼을 지정하지 않으므로 <br>
+  -- match되는 컬럼 모두를 연결 조건으로 사용한다. <br>
+  -- natural join의 경우 match되는 컬럼이 여러 개일 경우 모두 join조건으로 사용하므로, <br>
+  -- 실행속도나 performance면에서 좋지 않다. </p>
+<p>select b_id, title, c_name, price <br>
+  from book natural join danga; </p>
+<p>-- 판매 실적 <br>
+  -- 책코드, 책명, 수량, 단가, 고객명, 금액 <br>
+  select b.b_id, title, p_su, price, g_name, p_su*price 금액 <br>
+  from book b join danga d on b.b_id=d.b_id <br>
+  join panmai p on b.b_id=p.b_id <br>
+  join gogaek g on p.g_id=g.g_id; </p>
+<p>select b.b_id, title, p_su, price, g_name, p_su*price 금액 <br>
+  from book b ,danga d, panmai p, gogaek g <br>
+  where b.b_id=d.b_id <br>
+  and b.b_id=p.b_id <br>
+  and p.g_id=g.g_id; </p>
+<p>-- 책코드, 책명, 전체판매권수(판매된 책의) <br>
+  select b.b_id, title, p_su from book b join panmai p <br>
+  on b.b_id=p.b_id; <br>
+  select b.b_id, title, sum(p_su) 권수 from book b join panmai p <br>
+  on b.b_id=p.b_id <br>
+  group by b.b_id, title; </p>
+<p>-- 책코드, 책명, 단가, 전체판매권수, 금액(판매된 책의) <br>
+  select b.b_id, title, price, sum(p_su) 권수, <br>
+  sum(p_su*price) 금액 <br>
+  from book b join panmai p on b.b_id=p.b_id <br>
+  join danga d on b.b_id=d.b_id <br>
+  group by b.b_id, title, price; </p>
+<p>-- 판매된 전체권수가 10권 이상인 책만출력 <br>
+  -- (책코드, 책명, 수량) <br>
+  select b.b_id, title, sum(p_su) 권수 from <br>
+  book b join panmai p on b.b_id=p.b_id <br>
+  group by b.b_id, title <br>
+  having sum(p_su)&gt;=10; </p>
+<p>-- 판매된 책코드와 책이름 출력(중복 배제) <br>
+  select distinct b.b_id, title from <br>
+  book b join panmai p on b.b_id=p.b_id; </p>
+<p>-- 가장 판매 권수가 많은 책코드와 책이름 <br>
+  select b_id, title from ( <br>
+  select b_id, title, 권수, rank() over(order by 권수 desc) r from ( <br>
+  select b.b_id, title, sum(p_su) 권수 from book b <br>
+  join panmai p on b.b_id=p.b_id <br>
+  group by b.b_id, title <br>
+  ) <br>
+  ) where r=1; </p>
+<p>select b_id, title from ( <br>
+  select b.b_id, title, sum(p_su) 권수, <br>
+  rank() over(order by sum(p_su) desc) r <br>
+  from book b <br>
+  join panmai p on b.b_id=p.b_id <br>
+  group by b.b_id, title <br>
+  ) where r=1; </p>
+<p>-- 고객별 판매금액(고객코드, 고객명, 판매금액) <br>
+  select g.g_id, g_name, (p_su*price) 금액 <br>
+  from panmai p, danga d, gogaek g <br>
+  where p.b_id=d.b_id and g.g_id = p.g_id; </p>
+<p>select g.g_id, g_name, sum(p_su*price) 금액 <br>
+  from panmai p, danga d, gogaek g <br>
+  where p.b_id=d.b_id and g.g_id = p.g_id <br>
+  group by g.g_id, g_name; </p>
+<p>-- outer join(외부 조인)<a name="72"></a><br>
+  -- join 조건을 만족하지 않는 행을 보기 위한 추가적인 join의 형태이다. <br>
+  -- 일반적인 join으로 얻을 수 없는 데이터를 구하고 싶을 때 사용하며, '+' 연산자를 사용한다. <br>
+  -- outer join은 조인 조건의 양측 컬럼 값 중에서 하나가 null인 경우에도 조인 결과를 <br>
+  -- 출력할 수 있는 방법이다. <br>
+  -- equi join은 조인 조건에서 양측 컬럼 값 중에서 하나라도 null이면 '=' 비교 결과가 <br>
+-- 거짓이 되어 조인 결과로 출력되지 않는다. </p>
+<p>select b.b_id, title, p_su from book b <br>
+  join panmai p on b.b_id=p.b_id; --equi 조인 </p>
+<p>-- left outer join<a name="73"></a><br>
+-- 왼쪽 테이블의 데이터는 모두 출력하고 오른쪽 테이블은 조건에 맞는 데이터만 출력 </p>
+<p>select 테이블1명.컬럼명, 테이블2명.컬럼명 from 테이블1명, 테이블2명 <br>
+  where 테이블1명.컬럼명=테이블2명.컬럼명(+); </p>
+<p>또는 </p>
+<p>select 테이블1명.컬럼명, 테이블2명.컬럼명 from 테이블1명 <br>
+  left outer join 테이블2명 <br>
+  on 테이블1명.컬럼명=테이블2명.컬럼명; </p>
+<p>select b.b_id, title, p_su from book b <br>
+  left outer join panmai p on b.b_id=p.b_id; </p>
+<p>select b.b_id, title, p_su from book b, panmai p <br>
+  where b.b_id=p.b_id(+); </p>
+<p>-- right outer join<a name="74"></a><br>
+오른쪽 테이블의 데이터는 모두 출력하고 왼쪽 테이블은 조건에 맞는 데이터만 출력 </p>
+<p>select 테이블1명.컬럼명, 테이블2명.컬럼명 from 테이블1명, 테이블2명 <br>
+  where 테이블1명.컬럼명(+)=테이블2명.컬럼명; </p>
+<p>또는 </p>
+<p>select 테이블1명.컬럼명, 테이블2명.컬럼명 from 테이블1명 <br>
+  right outer join 테이블2명 <br>
+  on 테이블1명.컬럼명=테이블2명.컬럼명; </p>
+<p>select b.b_id, title, p_su from panmai p <br>
+  right outer join book b on b.b_id=p.b_id; </p>
+<p>select b.b_id, title, p_su from panmai p, book b <br>
+  where p.b_id(+) = b.b_id; <br>
+  -- b.b_id(+) = p.b_id; -- 안됨 </p>
+<p>select b.b_id, title, price, p_su, p_su*price amt from book b <br>
+  left outer join danga d on b.b_id=d.b_id <br>
+  left outer join panmai p on b.b_id=p.b_id; </p>
+<p>select b.b_id, title, price, nvl(p_su, 0) p_su, <br>
+  nvl(p_su, 0)*price amt from book b <br>
+  left outer join danga d on b.b_id=d.b_id <br>
+  left outer join panmai p on b.b_id=p.b_id; </p>
+<p>-- 한권도 판매되지 않은 책 <br>
+  select b.b_id, title, p_su from book b <br>
+  left outer join panmai p on b.b_id=p.b_id; <br>
+  select b.b_id, title from book b <br>
+  left outer join panmai p on b.b_id=p.b_id <br>
+  where p_su is null; </p>
+<p>-- full outer join(left와 right outer join 결합형태)<a name="75"></a></p>
+<p>select 테이블1명.컬럼명, 테이블2명.컬럼명 <br>
+  from 테이블1명 full outer join 테이블2명 on 테이블1명.컬럼명=테이블2명.컬럼명; </p>
+<p>select g.g_id, g_name, b_id from panmai p <br>
+  full outer join gogaek g on p.g_id=g.g_id; </p>
+<p>select a.num, b.num, a.name,b.name, <br>
+  a.buseo, b.buseo,a.city, b.city from <br>
+  ( <br>
+  select num, name, buseo, city from insa <br>
+  where city='인천' <br>
+  ) a <br>
+  full outer join <br>
+  ( <br>
+  select num, name, buseo, city from insa <br>
+  where buseo='개발부' <br>
+  ) b <br>
+  on a.num=b.num; </p>
+<p>-- non-equi 조인<a name="76"></a><br>
+  -- 두테이블에 관련성있는 컬럼이 없고 한테이블 컬럼의 값이 다른 테이블 컬럼에 <br>
+-- 포함된 경우 사용(= 대신 &gt;, between 사용) </p>
+<p>select b.b_id, title, price from book b <br>
+  join danga d on b.b_id = d.b_id; </p>
+<p>select b.b_id, title, price from book b <br>
+  join danga d on b.b_id between d.b_id and d.b_id; </p>
+<p>-- cross join<a name="77"></a><br>
+상호 조인은 조인에 포함된 테이블의 카티션 곱(cartisian product)을 반환한다. </p>
+<p>select b.b_id, title, price from book b <br>
+  cross join danga d; </p>
+<p>-- self join<a name="78"></a><br>
+자신의 테이블을 alias를 사용하여 마치 두 개의 테이블처럼 join하는 형태이다. </p>
+<p>select a1.b_id, a1.name, a2.name from au_book a1 <br>
+  join au_book a2 on a1.b_id = a2.b_id <br>
+  order by a1.b_id </p>
+<p>select a1.b_id, a1.name, a2.name from au_book a1 <br>
+  join au_book a2 on a1.b_id = a2.b_id and a1.name &gt; a2.name <br>
+  order by a1.b_id </p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><strong>8. 서브쿼리</strong></p>
+<p>-- 서브쿼리(subquery)<a name="81"></a><br>
+  -- 하위 쿼리는 단일 값을 반환하며 select, insert, update, delete 문이나 다른 <br>
+  -- 하위 쿼리 내부에 중첩된 select 쿼리 이다. <br>
+-- 하위 쿼리는 식이 허용되는 모든 위치에서 사용할 수 있으며 단독으로 실행 가능 하다. </p>
+<p>--서점코드 서점명 판매금액합 비율<a name="82"></a><br>
+  select g.g_id, g_name, sum(p_su*price) amt, <br>
+  round(sum(p_su*price) / ( <br>
+  select sum(p_su*price) from panmai p1, danga d1 <br>
+  where p1.b_id=d1.b_id <br>
+  ) * 100, 1) 비율 <br>
+  from gogaek g join panmai p on g.g_id=p.g_id <br>
+  join danga d on p.b_id=d.b_id <br>
+group by g.g_id, g_name; </p>
+<p>-- 1. 년도별 판매현황 출력<a name="83"></a><br>
+  -- (년도 판매금액) <br>
+  select to_char(p_date, 'yyyy') 년도, sum(p_su*price) amt <br>
+  from danga d join panmai p on p.b_id=d.b_id <br>
+group by to_char(p_date, 'yyyy'); </p>
+<p>-- 2. 년도별 서점 판매현황 출력<a name="84"></a><br>
+  -- (년도 서점코드 서점명 판매금액) <br>
+  select to_char(p_date, 'yyyy') 년도, g.g_id, g_name, <br>
+  sum(p_su*price) amt <br>
+  from gogaek g join panmai p on g.g_id=p.g_id <br>
+  join danga d on p.b_id=d.b_id <br>
+  group by to_char(p_date, 'yyyy'), <br>
+  g.g_id, g_name <br>
+order by 년도; </p>
+<p>-- 3. 년도별 서점 판매현황이 가장 많은 자료 출력<a name="85"></a><br>
+  -- (년도 서점코드 서점명 판매금액) <br>
+  select 년도, g_id, g_name, amt from ( <br>
+  select 년도, g_id, g_name, amt, <br>
+  rank() over(partition by 년도 order by amt desc) r <br>
+  from ( <br>
+  select to_char(p_date, 'yyyy') 년도, g.g_id, g_name, <br>
+  sum(p_su*price) amt <br>
+  from gogaek g join panmai p on g.g_id=p.g_id <br>
+  join danga d on p.b_id=d.b_id <br>
+  group by to_char(p_date, 'yyyy'), <br>
+  g.g_id, g_name <br>
+  order by 년도 <br>
+  ) <br>
+) where r=1; </p>
+<p>-- with<a name="86"></a><br>
+-- 서브쿼리를 미리 블럭으로 정한후 사용(여러번 사용될 경우 간결) </p>
+<p>with year_panmai as ( <br>
+  select to_char(p_date, 'yyyy') 년도, g.g_id, g_name, <br>
+  sum(p_su*price) amt <br>
+  from gogaek g join panmai p on g.g_id=p.g_id <br>
+  join danga d on p.b_id=d.b_id <br>
+  group by to_char(p_date, 'yyyy'), <br>
+  g.g_id, g_name <br>
+  order by 년도 <br>
+  ) <br>
+  select 년도, g_id, g_name, amt from ( <br>
+  select 년도, g_id, g_name, amt, <br>
+  rank() over(partition by 년도 order by amt desc) r <br>
+  from year_panmai <br>
+  ) where r=1; </p>
+<p>-- 판매된 책코드, 책이름<a name="87"></a><br>
+  select distinct book.b_id, title from book join panmai <br>
+  on book.b_id = panmai.b_id; <br>
+  select b_id, title from book <br>
+  where b_id in (select distinct b_id from panmai); <br>
+  -- any : 비교함수중하나가참이면참 <br>
+  select b_id, title from book <br>
+  where b_id = any (select distinct b_id from panmai); <br>
+  -- some : 비교함수중일부가참이면참 <br>
+  select b_id, title from book <br>
+where b_id = some (select distinct b_id from panmai); </p>
+<p>-- 판매되지 않은 책코드, 책이름<a name="88"></a><br>
+  select b_id, title from book <br>
+  where not b_id in (select b_id from panmai); <br>
+  select book.b_id, title from book left outer join panmai <br>
+  on book.b_id = panmai.b_id <br>
+where p_su is null; </p>
+<p>-- exists : 하나라도 존재하면 참<a name="89"></a></p>
+<p>select title from book where <br>
+  exists (select * from panmai where p_su &gt; 10 and substr(b_id, 1, 1) = 'a'); </p>
+<p>-- 아래와 동일 </p>
+<p>select title from book ; </p>
+<p><br>
+  -- 상관 하위 부질의<a name="810"></a><br>
+  -- 상호 연관 서브 쿼리(correlated sub query)는 sub query가 main query의 값을 이용하고, <br>
+  -- 그렇게 구해진 sub query의 값을 다시 main query가 다시 이용하게 된다. </p>
+<p>-- 서점별로 1회 주문 수량이 가장 많은 책(서점명, 책이름, 수량)<a name="811"></a><br>
+  -- rank() over() 함수로도 구할 수 있음. <br>
+  select g1.g_id, g1.g_name, title, p_su <br>
+  from book b1 join panmai p1 on b1.b_id=p1.b_id <br>
+  join gogaek g1 on p1.g_id=g1.g_id <br>
+  where p_su = <br>
+  (select max(p_su) from panmai p2 <br>
+  where p2.g_id = p1.g_id) <br>
+order by g1.g_id; </p>
+<p>-- 기본급을 기준으로 순위 부여<a name="812"></a><br>
+  select name, basicpay, <br>
+  (select count(i2.basicpay) + 1 from insa i2 <br>
+  where i2.basicpay &gt; i1.basicpay) 순위 <br>
+from insa i1; </p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><strong>9. 뷰 시퀀스</strong> </p>
+<p>-- VIEW<a name="91"></a><br>
+  뷰란 이미 특정한 데이터베이스 내에 존재하는 하나 이상의 테이블에서 <br>
+  사용자가 얻기 원하는 데이터들만을 정확하고 편하게 가져오기 위하여 <br>
+  사전에 원하는 컬럼들 만을 모아서 만들어 놓은 가상의 테이블로 <br>
+편리성 및 보안에 목적이 있다.</p>
+<p> CREATE [OR REPLACE] VIEW 뷰이름<br>
+  AS subquery</p>
+<p>-- 사용자 권한 확인<a name="92"></a><br>
+  -- 사용자 계정<br>
+  SQL&gt;SELECT * FROM USER_SYS_PRIVS;<br>
+</p>
+<p>-- 사용자 권한 부여(RESOURCE롤의 권한 만으로는 뷰를 생성할 수 없다.)<br>
+  -- SYS 계정<br>
+  -- 서버에 있는 모든 시스템 권한 출력<br>
+  CMD&gt;sqlplus sys/암호 as sysdba<br>
+  SQL&gt;SELECT * FROM system_privilege_map;</p>
+<p>-- 사용자에게 뷰를 만들 수 있는 권한 부여<br>
+  SQL&gt;GRANT CREATE VIEW TO 사용자;</p>
+<p>-- 사용자 계정<br>
+  -- 권한 확인<br>
+  SQL&gt;CONN 사용자/암호<br>
+SQL&gt;SELECT * FROM USER_SYS_PRIVS;<br>
+<br>
+-- 책코드, 책이름, 단가, 고객코드, 고객명, 판매날짜, 판매수량<br>
+  SELECT b.b_id, title, price, g.g_id, g_name, p_date, p_su<br>
+  FROM BOOK b<br>
+  JOIN PANMAI p ON b.b_id=p.b_id<br>
+  JOIN danga d ON b.b_id = d.b_id<br>
+JOIN gogaek g ON g.g_id = p.g_id;</p>
+<p>-- 뷰 작성<a name="93"></a><br>
+  CREATE VIEW viewPan<br>
+  AS<br>
+  SELECT b.b_id, title, price, g.g_id, g_name, p_date, p_su<br>
+  FROM BOOK b<br>
+  JOIN PANMAI p ON b.b_id=p.b_id<br>
+  JOIN danga d ON b.b_id = d.b_id<br>
+  JOIN gogaek g ON g.g_id = p.g_id;</p>
+<p>SELECT * FROM viewPan;<br>
+</p>
+<p>-- 뷰 수정<a name="94"></a><br>
+  CREATE OR REPLACE VIEW viewPan<br>
+  AS<br>
+  SELECT b.b_id, title, price, g.g_id, g_name, p_date, p_su<br>
+  , p_su*price amt<br>
+  FROM BOOK b<br>
+  JOIN PANMAI p ON b.b_id=p.b_id<br>
+  JOIN danga d ON b.b_id = d.b_id<br>
+  JOIN gogaek g ON g.g_id = p.g_id;</p>
+<p>SELECT * FROM viewPan;</p>
+<p>CREATE OR REPLACE VIEW yearPan<br>
+  AS<br>
+  SELECT TO_CHAR(p_date, 'YYYY') 년도, g.g_id, g_name,<br>
+  SUM(p_su*price) amt<br>
+  FROM GOGAEK g JOIN PANMAI p ON g.g_id=p.g_id<br>
+  JOIN DANGA d ON p.b_id=d.b_id<br>
+  GROUP BY TO_CHAR(p_date, 'YYYY'),<br>
+  g.g_id, g_name<br>
+  ORDER BY 년도 DESC;</p>
+<p>SELECT * FROM yearPan;</p>
+<p>&nbsp;</p>
+<p>-- 뷰 정보 확인<br>
+  DESC viewPAN;<br>
+  SELECT view_name, text FROM user_views;<br>
+</p>
+<p>-- 뷰 삭제<a name="95"></a><br>
+  DROP VIEW yearPan;<br>
+  SELECT view_name, text FROM user_views;<br>
+</p>
+<p>-- 뷰를 이용한 자료 입력 및 수정, 삭제<a name="96"></a><br>
+  CREATE TABLE TestA(<br>
+  a_id NUMBER(4) PRIMARY KEY NOT NULL<br>
+  ,name VARCHAR2(20) NOT NULL<br>
+  ,city VARCHAR2(20) NOT NULL<br>
+  ,memo VARCHAR2(100)<br>
+  );</p>
+<p>CREATE TABLE TestB(<br>
+  b_id NUMBER(4) PRIMARY KEY NOT NULL<br>
+  ,a_id NUMBER(4) CONSTRAINT FK_TestB_id<br>
+  REFERENCES TestA(a_id)<br>
+  ON DELETE CASCADE<br>
+  ,score NUMBER(3)<br>
+  );</p>
+<p>INSERT INTO TestA(a_id, name, city, memo) <br>
+  VALUES (1, '홍길동', '서울', NULL);<br>
+  INSERT INTO TestA(a_id, name, city, memo) <br>
+  VALUES (2, '이순신', '부산', NULL);<br>
+  INSERT INTO TestA(a_id, name, city, memo) <br>
+  VALUES (3, '어려워', '서울', 'C/C++');<br>
+  INSERT INTO TestA(a_id, name, city, memo)<br>
+  VALUES (4, '이기자', '인천', NULL);</p>
+<p>INSERT INTO TestB(b_id, a_id, score) VALUES (1, 1, 80);<br>
+  INSERT INTO TestB(b_id, a_id, score) VALUES (2, 2, 70);<br>
+  INSERT INTO TestB(b_id, a_id, score) VALUES (3, 3, 90);<br>
+  INSERT INTO TestB(b_id, a_id, score) VALUES (4, 4, 60);</p>
+<p>COMMIT;</p>
+<p>SELECT * FROM TestA;<br>
+  SELECT * FROM TestB;</p>
+<p>-- testView1 뷰<br>
+  -- a_id, b_id, name, memo, score<br>
+  CREATE OR REPLACE VIEW testView1<br>
+  AS<br>
+  SELECT a_id, b_id, name, memo, score <br>
+  FROM TestA a JOIN TestB b USING(a_id);</p>
+<p>-- testView2 뷰<br>
+  -- a_id, name, city<br>
+  CREATE OR REPLACE VIEW testView2<br>
+  AS<br>
+  SELECT a_id, name, city FROM TestA;</p>
+<p>-- 자료 입력<br>
+  INSERT INTO testView1 (a_id, b_id, name, memo, score) <br>
+  VALUES (5, 5, '입력될까', NULL, 90);<br>
+  -- 오류 : 한 번에 두 개의 테이블에 입력할 수 없다.<br>
+  -- (단순 뷰가 아닌 경우 추가 불가)</p>
+<p>INSERT INTO testView2 (a_id, name) VALUES (5, '입력될까');<br>
+  -- 오류 : TestA 테이블의 city는 NULL 될 수 없다.</p>
+<p>INSERT INTO testView2 (a_id, name, city) <br>
+  VALUES (5, '입력될까', '궁금');<br>
+  -- TestA 테이블에 입력</p>
+<p>SELECT * FROM TestA</p>
+<p>UPDATE testView1 SET name='재밌다', <br>
+  score=100 WHERE a_id = 1;<br>
+  -- 오류 : 한 번에 두 개의 테이블을 수정할 수 없다.<br>
+  -- (단순 뷰가 아닌 경우 수정 불가)</p>
+<p>-- 단순 뷰는 수정 가능 하다.<br>
+  UPDATE testView2 SET name='재밌다' WHERE a_id = 1;<br>
+  SELECT * FROM TestA;<br>
+</p>
+<p>-- WITH CHECK OPTION<a name="97"></a><br>
+  뷰를 통해 참조 무결성(reference integrity)을 검사할 수 있고 DB 레벨에서의 constraint 적용이 가능하다. 즉, WITH CHECK OPTION 절을 사용한 뷰에서 INSERT와 UPDATE를 수행하면 에러가 발생한다.<br>
+</p>
+<p>-- testView2 뷰 를 city 가 '서울'인 자료만 갖는 뷰로 수정<br>
+  CREATE OR REPLACE VIEW testView2<br>
+  AS<br>
+  SELECT a_id, name, city FROM TestA WHERE city = '서울';</p>
+<p>SELECT * FROM testView2;</p>
+<p>-- testView2 뷰를 이용하여 a_id가 1인 자료의 city 를 '부산'으로 수정<br>
+  UPDATE testView2 SET city='부산' WHERE a_id = 1; -- 수정 됨.</p>
+<p>-- testView2 뷰 에 WITH CHECK OPTION을 부여하여 수정한다.<br>
+  CREATE OR REPLACE VIEW testView2<br>
+  AS<br>
+  SELECT a_id, name, city FROM TestA WHERE city = '서울'<br>
+  WITH CHECK OPTION CONSTRAINT ch_testView2;</p>
+<p>-- testView2 뷰를 이용하여 a_id가 3인 자료의 city 를 '부산'으로 수정한다.<br>
+  UPDATE testView2 SET city='부산' WHERE a_id = 3; -- 오류</p>
+<p>- testView1, testView2 뷰 및 테이블 삭제<br>
+  DROP VIEW testView1;<br>
+  DROP VIEW testView2;<br>
+  DROP TABLE testB PURGE;<br>
+  DROP TABLE testA PURGE;<br>
+</p>
+<p>-- 머트리얼라이즈 뷰(MATERIALIZED VIEW)<a name="98"></a><br>
+  /*<br>
+  실제 데이터(통계정보)를 자신이 가지고 있으며, master 테이블이라고 불리는 기준이 되는 테이블에 INSERT, UPDATE, DELETE가 발생하면 새로운 데이터를 MATERIALIZED 뷰에 반영</p>
+<p>- SUM, MIN, MAX, AVG, COUNT 등 그룹함수를 미리 계산해 놓을 때 사용<br>
+  - USER_SEGMENTS 에서 확인 가능</p>
+<p>-- 옵션<br>
+  - BUILD IMMEDIATE : MView 생성과 동시에 데이터들도 생성<br>
+  - BUILD DEFERRED : MView를 생성은 하지만, 그 안의 데이터는 
+  추후에 생성<br>
+  - REFRESH : MView의 데이터를 새로 고치는 시기와 방법을 결정<br>
+  <br>
+  1) 시기<br>
+  <br>
+  1) ON COMMIT - 기초 테이블에 Commit 이 일어날 때 Refresh 가 일어나는 방안이며,<br>
+  이는 1 개의 테이블에 COUNT(*), SUM(*)과 같은 집합 함수를 사용하거나, <br>
+  MView에 조인만이 있는 경우, Group By 절에 사용된 컬럼에 대해 COUNT(col) 함수가 기술된 경우만 사용이 가능<br>
+  <br>
+  2) ON DEMAND - 사용자가 DBMS_MVIEW 패키지 (REFRESH, REFRESH_ALL_MVIEWS,<br>
+  REFRESH_DEPENDENT) 를 실행 한 경우 Refresh 되는 경우<br>
+  <br>
+  2) 방법<br>
+  <br>
+  1) COMPLETE - MView의 정의에 따라 MView의 데이터 전체가 Refresh 되는 것으로<br>
+  ATOMIC_REFRESH=TRUE와 COMPLETE으로 설정한 경우<br>
+  <br>
+  2) FAST - 새로운 데이터가 삽입될 때마다 점진적으로 Refresh 되는 방안<br>
+  <br>
+  3) FORCE - 이 경우 먼저 Fast Refresh가 가능한지 점검 후 가능하면 이를 적용하고,<br>
+  아니면 Complete Refresh를 적용(디폴트)<br>
+  <br>
+  4) NEVER - Refresh를 쓰지 않는다.<br>
+  <br>
+  - ENABLE QUERY REWRITE : MView 생성시 이 옵션을 주어야만 임의의 SQL문장을 처리시<br>
+  Query Rewrite를 고려한다. 이는 쿼리 재작성의 기능이다. 이전의 쿼리를 수정 하지 않고 재작성이 가능 한 기능<br>
+  */</p>
+<p>-- 사용자에게 권한 설정<a name="99"></a><br>
+  -- QUERY REWRITE : 쿼리 재작성 권한<br>
+  -- SYS 사용자(sqlplus sys/암호 as sysdba)<br>
+  GRANT QUERY REWRITE TO 사용자;<br>
+  GRANT CREATE MATERIALIZED VIEW TO 사용자;</p>
+<p>-- 사용자<br>
+  SELECT * FROM USER_SYS_PRIVS;</p>
+<p>SELECT * FROM USER_SEGMENTS;</p>
+<p>CREATE MATERIALIZED VIEW panmview<br>
+  BUILD IMMEDIATE<br>
+  REFRESH<br>
+  COMPLETE<br>
+  ON DEMAND<br>
+  ENABLE QUERY REWRITE<br>
+  AS <br>
+  SELECT TO_CHAR(p_date, 'YYYY') 년도, <br>
+  TO_CHAR(p_date, 'MM') 월,<br>
+  SUM(p_su*price) 금액<br>
+  FROM PANMAI JOIN DANGA d ON p.b_id=d.b_id<br>
+  GROUP BY TO_CHAR(p_date, 'YYYY'), <br>
+  TO_CHAR(p_date, 'MM')
+  ;<br>
+  <br>
+  SELECT * FROM TAB;<br>
+SELECT * FROM panmview;</p>
+<p>INSERT INTO panmai (id, g_id, b_id, p_date, p_su) <br>
+  VALUES (11, 6, 'b-1', '2010-05-05', 20);<br>
+  COMMIT;</p>
+<p>SELECT * FROM panmview;<br>
+  -- 추가된 자료가 반영되지 않음(ON DEMAND 때문에)</p>
+<p>-- 수동으로 재실행<br>
+  EXECUTE dbms_mview.refresh('panmview');<br>
+  SELECT * FROM panmview;<br>
+  <br>
+  DROP MATERIALIZED VIEW panmview;</p>
+<p>DELETE FROM PANMAI WHERE id=11;<br>
+  COMMIT;</p>
+<p>CREATE MATERIALIZED VIEW panmview<br>
+  BUILD IMMEDIATE<br>
+  REFRESH<br>
+  COMPLETE<br>
+  ON COMMIT<br>
+  ENABLE QUERY REWRITE<br>
+  AS <br>
+  SELECT TO_CHAR(p_date, 'YYYY') 년도, <br>
+  TO_CHAR(p_date, 'MM') 월,<br>
+  SUM(p_su*price) 금액<br>
+  FROM PANMAI JOIN DANGA d ON p.b_id=d.b_id<br>
+  GROUP BY TO_CHAR(p_date, 'YYYY'), <br>
+  TO_CHAR(p_date, 'MM')<br>
+  ;</p>
+<p>SELECT * FROM panmview;</p>
+<p>INSERT INTO panmai (id, g_id, b_id, p_date, p_su) <br>
+  VALUES (11, 6, 'b-1', '2010-05-05', 20);<br>
+  COMMIT;</p>
+<p>SELECT * FROM panmview;<br>
+  -- 바로 반영(ON COMMIT)</p>
+<p>DELETE FROM PANMAI WHERE id=11;<br>
+  COMMIT;</p>
+<p>DROP MATERIALIZED VIEW panmview;<br>
+</p>
+<p>-- SEQUENCE<a name="910"></a><br>
+  특정 컬럼에 대해 유일한 값을 연속적으로 생성시키기 위해 사용하는 방법으로 <br>
+  오라클에서 제공하는 것이 sequence라는 객체이다.<br>
+</p>
+<p>-- 사용자에게 시퀀스를 만들 수 있는 권한이 없는 경우 권한 부여(RESOURCE 롤에<a name="911"></a> <br>
+  기본적으로 시퀀스를 만들수있는 권한 있음)<br>
+  -- SYS 계정<br>
+  CMD&gt;sqlplus sys/암호 as sysdba<br>
+  SQL&gt;GRANT CREATE SEQUENCE TO 사용자;</p>
+<p>-- 부여된 권한 확인<br>
+  SQL&gt;CONN 사용자/암호<br>
+  SQL&gt;SELECT * FROM USER_SYS_PRIVS;<br>
+</p>
+<p>-- 100부터 1씩 증가하는 시퀀스 작성<a name="912"></a><br>
+  CREATE SEQUENCE seq1 INCREMENT BY 1<br>
+  START WITH 100<br>
+  MINVALUE 1<br>
+  MAXVALUE 10000;</p>
+<p>-- 3부터 999 까지 3씩 증가하는 시퀀스(미리 5개씩 캐시)<a name="913"></a><br>
+  CREATE SEQUENCE seq2 INCREMENT BY 3<br>
+  MINVALUE 3<br>
+  MAXVALUE 999<br>
+  CACHE 5;</p>
+<p>-- 최대값에 도달하면 처음부터 다시 시작<a name="914"></a><br>
+  CREATE SEQUENCE seq3 INCREMENT BY 3<br>
+  START WITH 9<br>
+  MINVALUE 3<br>
+  MAXVALUE 12<br>
+  CYCLE<br>
+  CACHE 2;</p>
+<p>-- 1부터 증가하는 가장 간단한 시퀀스<a name="915"></a><br>
+  CREATE SEQUENCE seq4;<br>
+</p>
+<p>-- 시퀀스 목록 확인<a name="916"></a><br>
+  SELECT * FROM seq;<br>
+  SELECT * FROM user_sequences;<br>
+</p>
+<p>-- 시퀀스 활용<a name="917"></a><br>
+  CREATE TABLE seqtest (<br>
+  num1 NUMBER<br>
+  ,num2 NUMBER<br>
+  ,num3 NUMBER<br>
+  ,num4 NUMBER<br>
+  );</p>
+<p>INSERT INTO seqtest VALUES (seq1.NEXTVAL, SEQ2.NEXTVAL,<br>
+  SEQ3.NEXTVAL, seq4.nextval);<br>
+  SELECT * FROM seqtest;</p>
+<p>DELETE FROM seqtest;</p>
+<p>INSERT INTO seqtest VALUES (seq1.NEXTVAL, SEQ2.NEXTVAL,<br>
+  SEQ3.NEXTVAL, seq4.nextval);<br>
+  SELECT * FROM seqtest;</p>
+<p>INSERT INTO seqtest VALUES (seq1.currVAL, SEQ2.currVAL,<br>
+  SEQ3.currVAL, seq4.currval);<br>
+  SELECT * FROM seqtest;<br>
+</p>
+<p>-- 시퀀스 삭제<a name="918"></a><br>
+DROP SEQUENCE 시퀀스명;<br>
+<br>
+  DROP SEQUENCE seq1;<br>
+  DROP SEQUENCE seq2;<br>
+  DROP SEQUENCE seq3;<br>
+DROP SEQUENCE seq4;</p>
+<p>SELECT * FROM seq;<br>
+  DROP TABLE seqtest PURGE;<br>
+</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><strong>10. 계층적 질의</strong><br>
+  <br>
+  -- 계층적 질의<a name="101"></a><br>
+  오라클에서는 계층적인 데이터를 저장한 컬럼으로부터 데이터를 검색하여 <br>
+  계층적으로 출력할 수 있는 기능을 제공한다.<br>
+  SELECT 문에서 START WITH와 CONNECT BY 절을 이용하여 데이터를 계층적인 형태로 출력할 수 있다. <br>
+  <br>
+  -- START WITH : 절 계층적인 출력 형식을 표현하기 위한 최상위 행<a name="102"></a><br>
+  <br>
+  -- CONNECT BY : 절 계층관계의 데이터를 지정하는 컬럼<a name="103"></a><br>
+  <br>
+  -- PRIOR 연산자 : CONNECT BY는 PRIOR 연산자와 함께 사용하여 부모 행을 확인할 수 있다.<a name="104"></a> <br>
+  PRIOR 연산자의 위치에 따라 top-down 방식인지 bottom up 방식인지를 결정한다. <br>
+  PRIOR 연산자가 붙은 쪽의 컬럼이 부모 행이 된다.<br>
+  <br>
+  -- WHERE 절 : where 절이 JOIN을 포함하고 있을 경우 CONNECT BY 절을 처리하기 전에 JOIN 조건부를 <a name="105"></a><br>
+  적용하여 처리하고, JOIN을 포함하고 있지 않을 경우 CONNECT BY 절을 처리한 후에 WHERE 절의 조건을 처리한다.<br>
+  <br>
+  -- LEVEL : 계층적 질의문에서 검색된 결과에 대해 계층별로 레벨 번호 표시, 루트 노드는 1, <a name="106"></a><br>
+  하위 레벨로 갈수록 1씩 증가<br>
+  <br>
+  -- 예제<a name="107"></a><br>
+  <br>
+  CREATE TABLE exam(<br>
+  num NUMBER PRIMARY KEY<br>
+  ,dname VARCHAR2(50) NOT NULL<br>
+  ,loc VARCHAR2(50)<br>
+  ,parent NUMBER<br>
+);</p>
+<p>INSERT INTO exam VALUES(10, '공과대학', NULL, NULL);<br>
+  INSERT INTO exam VALUES(100, '정보미디어학부', NULL, 10);<br>
+  INSERT INTO exam VALUES(200, '메카트로닉스학부', NULL, 10);<br>
+  INSERT INTO exam VALUES(101, '컴퓨터공학과', '1호관', 100);<br>
+  INSERT INTO exam VALUES(102, '멀티미디어학과', '2호관', 100);<br>
+  INSERT INTO exam VALUES(201, '전자공학과', '3호관', 200);<br>
+  INSERT INTO exam VALUES(202, '기계공학과', '4호관', 200);</p>
+<p>SELECT num, dname, loc, LEVEL, parent FROM exam<br>
+  START WITH num=10 -- 출력 시작할 최상위행<br>
+  CONNECT BY PRIOR num=parent; -- 계층관계지정<br>
+  -- PRIOR 연산자가 붙은쪽이 부모</p>
+<p>SELECT LPAD(' ', (LEVEL-1)*4) || dname AS 조직도 FROM exam<br>
+  START WITH num=10<br>
+  CONNECT BY PRIOR num=parent;</p>
+<p>SELECT num, dname, loc, LEVEL, parent FROM exam<br>
+  START WITH num=102<br>
+  CONNECT BY PRIOR parent=num;</p>
+<p>-- 정보미디어 학부만 출력 하지 않음<br>
+  SELECT num, dname, loc, LEVEL, parent FROM exam<br>
+  WHERE num != 100<br>
+  START WITH num=10<br>
+  CONNECT BY PRIOR num=parent;</p>
+<p>-- 정보미디어학부 및 정보미디어학부의 과도 출력하지 않음<br>
+  SELECT num, dname, loc, LEVEL, parent FROM exam<br>
+  START WITH num=10<br>
+  CONNECT BY PRIOR num=parent AND num != 100;<br>
+</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><strong>11. 트랜잭션</strong><br>
+  <br>
+  -- 트랜잭션<a name="111"></a><br>
+트랜잭션(transaction)은 하나의 논리적 작업 단위로 수행되는 일련의 작업으로 테이블에 <br>
+INSERT, UPDATE, DELETE 문으로 지시하고, COMMIT을 실행하면 모든 변경 사항이 영구히 데이터베이스에 <br>
+저장되며, ROLLBACK은 마지막 COMMIT이나 ROLLBACK 이후의 변경 사항을 취소하고 데이터베이스를 <br>
+원래의 상태로 되돌려 준다. 즉, 트랜잭션에서 데이터베이스를 변경하라는 명령이 COMMIT이고, <br>
+COMMIT 전까지 변경된 것을 되돌리는 것이 ROLLBACK이다.<br>
+<br>
+-- COMMIT<br>
+  -- ROLLBACK<br>
+  -- SAVEPOINT<br>
+  -- transaction 내의 한 시점을 표시한다.<br>
+  -- ROLLBACK TO SAVEPOINT 명령어로 표시 지점까지 ROLLBACK하는데 쓰인다.<br>
+  <br>
+  -- 예제<br> 
+  <br>
+CREATE TABLE test AS SELECT num, name, city FROM insa;</p>
+<p>SELECT * FROM test;</p>
+<p>INSERT INTO test VALUES(2000, 'test', '서울');<br>
+  SELECT * FROM test;</p>
+<p>SAVEPOINT a;</p>
+<p>UPDATE test SET city='울산' WHERE num=1001;<br>
+  SELECT * FROM test;</p>
+<p>ROLLBACK TO a; -- UPDATE는 롤백되고 INSERT는 롤백되지 않음</p>
+<p>SELECT * FROM test;</p>
+<p>UPDATE test SET city='부산' WHERE num=1001;<br>
+  SELECT * FROM test;</p>
+<p>ROLLBACK;</p>
+<p>SELECT * FROM test;<br>
+  INSERT INTO test VALUES(2000, '테스트', '인천');<br>
+  COMMIT;</p>
+<p>SELECT * FROM test;<br>
+  ROLLBACK; -- COMMIT가 된 상태에서는 롤백되지 않음</p>
+<p>SELECT * FROM test;</p>
+<p>DROP TABLE test PURGE;<br>
+  <br>
+  <br>
+  <br>
+  -- SET TRANSACTION : 다양한 트랜잭션 속성을 지정<a name="112"></a><br>
+  -- 커낵션 1<br>
+  CREATE TABLE test (<br>
+  id NUMBER(3) PRIMARY KEY,<br>
+  value VARCHAR2(30),<br>
+  score NUMBER(3)<br>
+);</p>
+<p>INSERT INTO test VALUES (1, 'a', 80);<br>
+  INSERT INTO test VALUES (2, 'b', 80);<br>
+  SELECT * FROM test; -- 확인</p>
+<p>-- 커낵션 2<br>
+  SELECT * FROM test;<br>
+  -- 추가된 결과를 확인 할 수 없다.</p>
+<p>-- 커낵션 1<br>
+  COMMIT;</p>
+<p>-- 커낵션 2<br>
+  SELECT * FROM test;</p>
+<p>-- 커낵션 1<br>
+  SET TRANSACTION READ ONLY; -- INSERT, UPDATE, DELETE가 되지 않고 SELECT만 가능<br>
+  DELETE FROM test; -- 오류</p>
+<p>ROLLBACK;<br>
+  SET TRANSACTION READ WRITE;<br>
+  <br>
+  <br>
+  <br>
+  -- SET AUTOCOMMIT<a name="113"></a><br>
+  SQL&gt;show autocommit -- 상태확인<br>
+  autocommit OFF<br>
+  SQL&gt;set autocommit on<br>
+  SQL&gt;show autocommit<br>
+  autocommit IMMEDIATE<br>
+  SQL&gt;set autocommit 3<br>
+  SQL&gt;show autocommit<br>
+  모든 3 DML문에 AUTOCOMMIT ON<br>
+  SQL&gt;set autocommit off<br>
+</p>
+<p><br>
+-- LOCK : 현재의 트랜잭션이 사용하고 있는 데이터에 대해 다른 트랜잭션의 검색이나 변경을 막아 여러 <a name="114"></a><br>
+트랜잭션이 동시에 같은 데이터를 사용 할 수 있도록 하는 것</p>
+<p>-- 커낵션 1<br>
+  SELECT * FROM test;<br>
+  UPDATE test SET score = 200<br>
+  WHERE id = 1;<br>
+  SET TIME ON;</p>
+<p>-- 커낵션 2<br>
+  SELECT * FROM test<br>
+  FOR UPDATE WAIT 5;<br>
+  -- 5초 후 오류발생 메시지</p>
+<p>-- 커낵션 1<br>
+  ROLLBACK;</p>
+<p>LOCK TABLE test IN EXCLUSIVE MODE;<br>
+  -- EXCLUSIVE : 잠긴 테이블에 쿼리만 허용<br>
+  -- NOWAIT : 다른 사용자가 이미 lock 하였더라도 바로 자신에게 제어권이 넘겨 오도록 함.</p>
+<p>DELETE FROM test;</p>
+<p>-- 커낵션 2<br>
+  UPDATE test SET score = 100 WHERE id = 1;<br>
+  -- 커넥션 1이 COMMIT 또는 ROLLBACK 할 때 까지 멈춰 있음.</p>
+<p>-- 커낵션 1<br>
+  ROLLBACK;<br>
+</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><strong>12. PL/SQL<br>
+</strong><br>
+  <br>
+  -- PLSQL<a name="121"></a><br>
+PL/SQL(Procedural Language extensions to SQL)은 프로그래밍언어의 특성을 가지는 SQL의 확장이며, <br>
+데이터 조작과 질의 문장은 PL/SQL의 절차적 코드 안에 포함된다. 또한 PL/SQL을 사용하면 <br>
+SQL로 할 수 없는 절차적 작업이 가능하다. 여기에서 절차적이란 어떤 것이 어떻게 완료되는지 그 방법을 <br>
+정확하게 코드에 기술 한다는 것을 의미한다.</p>
+<p>-- SQLGATE도 확인 가능<br>
+  <br>  
+  -- SQLPLUS에서 DBMS_OUTPUT.PUT_LINE('값'); 으로 화면에 출력<br>
+SET SERVEROUTPUT ON</p>
+<p>-- DBMS_OUTPUT.PUT_LINE('값');<br>
+  출력 후 라인 넘김</p>
+<p>-- DBMS_OUTPUT.PUT('값');<br>
+  출력 후 라인 넘기지 않음</p>
+<p>-- DBMS_OUTPUT.NEW_LINE();<br>
+  라인 넘김<br>
+</p>
+<p>  -- 대입문 형식 <a name="122"></a><br>
+  변수 := 값;<br>
+</p>
+<p><br>
+  -- %TYPE<a name="123"></a><br>
+  -- 테이블 컬럼 자료형을 참조하는 자료형</p>
+<p>DECLARE<br>
+  vname insa.name%TYPE;<br>
+  vpay NUMBER;<br>
+  BEGIN<br>
+  SELECT name, basicpay+sudang INTO vname, vpay<br>
+  FROM INSA WHERE num=1001;<br>
+  DBMS_OUTPUT.PUT_LINE('이름 : ' || vname);<br>
+  DBMS_OUTPUT.PUT_LINE('급여 : ' || vpay);<br>
+  END;<br>
+  / -- 실행<br>
+</p>
+<p><br>
+  -- %ROWTYPE<a name="124"></a><br>
+  -- 테이블 스키마와 같은 구조체변수</p>
+<p>DECLARE<br>
+  vdata insa%ROWTYPE;<br>
+  BEGIN<br>
+  SELECT name, basicpay INTO vdata.name, vdata.basicpay<br>
+  FROM INSA WHERE num=1001;<br>
+  DBMS_OUTPUT.PUT_LINE('이름 : ' || vdata.name);<br>
+  DBMS_OUTPUT.PUT_LINE('급여 : ' || vdata.basicpay);<br>
+  END;<br>
+  /<br>
+</p>
+<p><br>
+  -- 사용자 정의 구조체 변수<a name="125"></a><br>
+</p>
+<p>DECLARE<br>
+  TYPE myData IS RECORD<br>
+  (<br>
+  vname insa.name%TYPE<br>
+  ,vpay NUMBER<br>
+  );<br>
+  vdata myData;<br>
+  BEGIN<br>
+  SELECT name, basicpay+sudang INTO<br>
+  vdata.vname, vdata.vpay<br>
+  FROM INSA WHERE num=1001;<br>
+  DBMS_OUTPUT.PUT_LINE('이름 : ' || vdata.vname);<br>
+  DBMS_OUTPUT.PUT_LINE('급여 : ' || vdata.vpay);<br>
+  END;<br>
+  /<br>
+</p>
+<p>  <br>
+  -- IF 조건 THEN ~ ELSIF 조건 THEN ~ ELSE ~ END IF 문<a name="126"></a><br>
+TRUE면 THEN과 ELSE사이의 문장을 수행하고 FALSE나 NULL이면 ELSE와 END IF사이의 문장을 수행한다.<br>
+<br>
+DECLARE<br>
+  vpay NUMBER;<br>
+  vname insa.name%TYPE;<br>
+  vtax NUMBER;<br>
+  BEGIN<br>
+  SELECT name, basicpay+sudang INTO vname, vpay<br>
+  FROM INSA WHERE num=1001;<br>
+  IF vpay &gt;= 2500000 THEN<br>
+  vtax := vpay * 0.03;<br>
+  ELSIF vpay &gt;= 2000000 THEN<br>
+  vtax := vpay * 0.02;<br>
+  ELSE<br>
+  vtax := 0;<br>
+  END IF;<br>
+  DBMS_OUTPUT.PUT_LINE('이름 : ' || vname);<br>
+  DBMS_OUTPUT.PUT_LINE('급여 : ' || vpay);<br>
+  DBMS_OUTPUT.PUT_LINE('세금 : ' || vtax);<br>
+  END;<br>
+  /<br>
+</p>
+<p>-- WHILE 조건 LOOP ~ END LOOP<a name="127"></a><br>
+  제어 조건이 TRUE인 동안만 일련의 문장을 반복하기 위해 WHILE LOOP문장을 사용한다.</p>
+<p>-- EXIT [WHEN condition];<a name="128"></a><br>
+  EXIT 문을 이용하면 END LOOP 문 다음 문으로 제어를 보내기 때문에 루프를 종료할 수 있다. </p>
+<p>-- LOOP ~ END LOOP<a name="129"></a><br>
+반복문으로 &quot;EXIT WHEN 조건&quot;이 실행문 앞과 뒤 어느 곳이나 위치할 수 있으며 &quot;EXIT WHEN 조건&quot;에서 조건을 만족하면 빠져 나간다.<br>
+<br>
+  DECLARE<br>
+  n NUMBER := 0;<br>
+  s NUMBER := 0;<br>
+  BEGIN<br>
+  WHILE n &lt; 100 LOOP<br>
+  n := n + 1;<br>
+  s := s + n;<br>
+  END LOOP;<br>
+  DBMS_OUTPUT.PUT_LINE('결과 : ' || s);<br>
+  END;<br>
+/</p>
+<p>------------------------------------------------------------------<br>
+  DECLARE<br>
+  n NUMBER := 1;<br>
+  s NUMBER := 0;<br>
+  BEGIN<br>
+  WHILE n &lt;= 100 LOOP<br>
+  s := s + n;<br>
+  n := n + 2;<br>
+  END LOOP;<br>
+  DBMS_OUTPUT.PUT_LINE('결과 : ' || s);<br>
+  END;</p>
+<p>------------------------------------------------------------------<br>
+  DECLARE<br>
+  n NUMBER := 0;<br>
+  s NUMBER := 0;<br>
+  BEGIN<br>
+  WHILE n &lt; 100 LOOP<br>
+  n := n + 1;<br>
+  IF MOD(n, 2) = 1 THEN<br>
+  s := s + n;<br>
+  END IF;<br>
+  END LOOP;<br>
+  DBMS_OUTPUT.PUT_LINE('결과 : ' || s);<br>
+  END;<br>
+  /</p>
+<p>------------------------------------------------------------------<br>
+  DECLARE<br>
+  n NUMBER := 1;<br>
+  m NUMBER := 0;<br>
+  g NUMBER;<br>
+  BEGIN<br>
+  WHILE n &lt; 9 LOOP<br>
+  n := n + 1;<br>
+  DBMS_OUTPUT.PUT_LINE(n || '단');<br>
+  m := 0;<br>
+  WHILE m &lt; 9 LOOP<br>
+  m := m + 1;<br>
+  g := n * m;<br>
+  DBMS_OUTPUT.PUT_LINE(n || '*' || m || '='|| g);<br>
+  END LOOP;<br>
+  END LOOP;<br>
+  END;<br>
+  /</p>
+<p>------------------------------------------------------------------<br>
+  DECLARE<br>
+  n NUMBER := 0;<br>
+  s NUMBER := 0;<br>
+  BEGIN<br>
+  LOOP<br>
+  n := n + 1;<br>
+  s := s + n;<br>
+  EXIT WHEN n=100;<br>
+  END LOOP;<br>
+  DBMS_OUTPUT.PUT_LINE('결과 : ' || s);<br>
+  END;<br>
+  /<br>
+</p>
+<p>  <br>
+  -- FOR ~ LOOP<a name="1210"></a><br>
+  FOR 에서 사용되는 변수는 자동 선언되므로 따로 선언하지 않아도 됨<br>
+&quot;시작수&quot;에서 1씩 증가하여 &quot;끝날 수&quot;가 될 때까지 반복 수행하며, FOR문에 사용되는 변수는 자동 선언되므로 따로 선언할 필요가 없다.</p>
+<p>-- FOR문<br>
+  FOR counter IN [REVERSE] 시작수 .. 끝낼수 LOOP<br>
+  실행문; <br>
+  END LOOP; </p>
+<p> REVERSE : &quot;끝날수&quot;에서 &quot;시작수&quot;까지 반복함으로써 인덱스가 1씩 감소되도록 한다.</p>
+<p>------------------------------------------------------------------<br>
+  DECLARE<br>
+  s NUMBER := 0;<br>
+  BEGIN<br>
+  FOR n IN 1 .. 100 LOOP<br>
+  s := s + n;<br>
+  END LOOP;<br>
+  DBMS_OUTPUT.PUT_LINE('결과 : ' || s);<br>
+  END;<br>
+  /</p>
+<p>------------------------------------------------------------------<br>
+  DECLARE<br>
+  BEGIN<br>
+  FOR n IN REVERSE 10 .. 1 LOOP<br>
+  DBMS_OUTPUT.PUT_LINE(TO_CHAR(n));<br>
+  END LOOP;<br>
+  END; -- 결과 안나옴<br>
+  /</p>
+<p>------------------------------------------------------------------<br>
+  DECLARE<br>
+  BEGIN<br>
+  FOR n IN REVERSE 1 .. 10 LOOP<br>
+  DBMS_OUTPUT.PUT_LINE(TO_CHAR(n));<br>
+  END LOOP;<br>
+  END;<br>
+  <br>
+  <br>
+  -- FOR 를 이용한 SELECT 문<br>
+  FOR 레코드이름 IN SELECT문 LOOP<br>
+  실행문; <br>
+END LOOP;</p>
+<p>------------------------------------------------------------------<br>
+  DECLARE<br>
+  BEGIN<br>
+  FOR rec IN (SELECT name, buseo, basicpay FROM insa) LOOP<br>
+  DBMS_OUTPUT.PUT_LINE(rec.name || ' ' ||<br>
+  rec.buseo || ' ' || rec.basicpay);<br>
+  END LOOP;<br>
+  END;</p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p><strong>13-1. 프로시져</strong> <br>
+  <br>
+  -- 프로시져(Stored Procedure)<a name="131"></a><br>
+PL/SQL에서 가장 대표적인 구조인 스토어드 프로시저는 개발자가 자주 실행해야 하는 업무 흐름을 미리 작성하여 데이터베이스 내에 저장해 두었다가 필요할 때마다 호출하여 실행할 수 있다.<br>
+<br>
+<br>
+  -- 테이블의 프로시저, 함수, 패키지 등 상호 참조되는 관계 확인<br>
+SELECT * FROM user_dependencies;<br>
+<br>
+-- 사용자에게 프로시져를 만들 수 있는 권한이 없는 경우 권한 설정<a name="132"></a><br>
+(RESOURCE 롤에 기본적으로 프로시져를 만들수있는 권한 있음)<br>
+  -- SYS 계정<br>
+  -- 사용자에게 프로시저를 만들 수 있는 권한이 없는 경우 부여<br>
+GRANT CREATE PROCEDURE TO 사용자명;</p>
+<p>-- 사용자 계정<br>
+  -- 부여된 권한 확인<br>
+  SELECT * FROM USER_SYS_PRIVS;<br>
+  <br>
+  -- 형식<a name="133"></a><br>
+  CREATE [OR REPLACE] PROCEDURE 프로시저이름<br>
+  [(<br>
+  매개변수 IN 자료형, // 입력용, 인수에서는 자료 형에서는 크기를 지정하면 안 된다.<br>
+  매개변수 OUT 자료형, // 출력용<br>
+  매개변수 IN OUT 자료형 // 입/출력용<br>
+  )]<br>
+  IS <br>
+  [변수의 선언]<br>
+  BEGIN<br>
+  .............<br>
+  [EXCEPTION]<br>
+  .............<br>
+END;<br>
+<br>
+<br>
+<br>
+IN 파라미터 : 호출자에 의해 프로시저로 전달되는 파라미터이며, <a name="134"></a><br>
+'읽기' 전용의 값으로 프로시저는 이 파라미터의 값을 변경할 수 없다.(디폴트 모드)<br>
+  <br>
+  OUT 파라미터 : 프로시저에서 값을 변경할 수 있고, '쓰기' 기능으로 프로시저가 정보를 호출자에게 돌려주는 기능이다. <br>
+  OUT 파라미터는 디폴트값을 지정할 수 없다.<br>
+  <br>
+IN OUT 파라미터 : 프로시저가 읽고 쓰는 작업을 동시에 할 수 있는 파라미터이다.<br>
+<br>
+-- PROCEDURE<br>
+  SELECT * FROM TAB;<br>
+  DROP TABLE EXAM PURGE;<br>
+DROP TABLE EXAM1 PURGE;</p>
+<p>SELECT * FROM seq;</p>
+<p>-- 시퀀스 작성<a name="135"></a><br>
+  CREATE SEQUENCE seq1 START WITH 1;<br>
+  SELECT * FROM seq;</p>
+<p>-- 테이블 작성<a name="136"></a><br>
+  CREATE TABLE EXAM1 (<br>
+  id NUMBER PRIMARY KEY<br>
+  ,name VARCHAR2(20)<br>
+  ,score NUMBER<br>
+  );</p>
+<p>-- 테이블에 자료를 추가하는 프로시저 작성<a name="137"></a><br>
+  CREATE OR REPLACE PROCEDURE proInsExam1<br>
+  IS<br>
+  BEGIN<br>
+  INSERT INTO EXAM1(id, name, score) VALUES (SEQ1.NEXTVAL, '홍길동', 80);<br>
+  COMMIT;<br>
+  END;<br>
+  <br>
+  <br>
+  -- 소스확인<a name="138"></a><br>
+  SELECT TEXT FROM user_source;<br>
+  <br>
+  <br>
+  -- 프로시저 목록 확인<a name="139"></a><br>
+  SELECT object_name FROM user_procedures;<br>
+  <br>
+  <br>
+  -- 프로시저 실행<a name="1310"></a><br>
+  EXECUTE proInsExam1;<br>
+  SELECT * FROM EXAM1;<br>
+  <br>
+  -- 프로시저 수정<a name="1311"></a><br>
+  -- IN<br>
+  CREATE OR REPLACE PROCEDURE proInsExam1<br>
+  (<br>
+  pname IN exam1.name%TYPE<br>
+  ,pscore IN exam1.score%TYPE<br>
+  ) <br>
+  IS<br>
+  BEGIN<br>
+  INSERT INTO EXAM1(id, name, score) VALUES (<br>
+  SEQ1.NEXTVAL, pname, pscore);<br>
+  COMMIT;<br>
+END;</p>
+<p>EXECUTE proInsExam1('이순신', 100);<br>
+  SELECT * FROM EXAM1;</p>
+<p>------------------------------------------------------------------<br>
+  CREATE OR REPLACE PROCEDURE proViewExam1<br>
+  (<br>
+  pid IN NUMBER<br>
+  )<br>
+  IS<br>
+  vname exam1.name%TYPE;<br>
+  vscore exam1.score%TYPE;<br>
+  BEGIN<br>
+  SELECT name, SCORE INTO vname, vscore FROM EXAM1 WHERE id = pid;<br>
+  DBMS_OUTPUT.PUT_LINE(vname || ' ' || vscore);<br>
+  DBMS_OUTPUT.PUT_LINE('유저 : ' || USER);<br>
+  END;<br>
+  EXECUTE proViewExam1(1);</p>
+<p>&nbsp;</p>
+<p>------------------------------------------------------------------<br>
+  -- 1. exam1 테이블에 pan varchar2(10) 필드 추가<a name="1312"></a><br>
+  ALTER TABLE exam1 ADD (pan varchar2(10));<br>
+  </p>
+<p>-- 2. 점수가 입력되면 pan 필드에 다음의 조건에 따라 값을 대입하도록<a name="1313"></a><br>
+  -- proInsExam1 프로시저 수정<br>
+  -- 80점이상 우수, 60점이상 보통, 60미만 불합격<br>
+  -- 실행 예<br>
+  -- EXECUTE proInsExam1('이기자', 80);<br>
+  -- SELECT * FROM exam1<br>
+  -- 1 이기자 80 우수</p>
+<p>CREATE OR REPLACE PROCEDURE proInsExam1<br>
+  (<br>
+  pname IN exam1.NAME%TYPE<br>
+  ,pscore IN exam1.SCORE%TYPE<br>
+  )<br>
+  IS<br>
+  vpan VARCHAR2(10);<br>
+  BEGIN<br>
+  IF pscore &gt;= 80 THEN<br>
+  vpan := '우수';<br>
+  ELSIF pscore &gt;= 60 THEN<br>
+  vpan := '보통';<br>
+  ELSE<br>
+  vpan := '불합격';<br>
+  END IF;</p>
+<p> INSERT INTO exam1 (id, name, score, pan) VALUES<br>
+  (SEQ1.NEXTVAL, pname, pscore, vpan);<br>
+  COMMIT;<br>
+  END;</p>
+<p>EXECUTE proInsExam1('이이이', 80);<br>
+  SELECT * FROM EXAM1;</p>
+<p>&nbsp;</p>
+<p>-- 3. 자료 수정 프로시저 작성<a name="1314"></a><br>
+  -- 실행예<br>
+  -- EXECUTE proUpdateExam1('이기자', 60, 1);<br>
+  -- SELECT * FROM exam1<br>
+  -- 1 이기자 60 보통</p>
+<p>CREATE OR REPLACE PROCEDURE proUpdateExam1<br>
+  (<br>
+  pname IN exam1.NAME%TYPE<br>
+  ,pscore IN exam1.SCORE%TYPE<br>
+  ,pid IN exam1.id%TYPE<br>
+  )<br>
+  IS<br>
+  vpan VARCHAR2(10);<br>
+  BEGIN<br>
+  IF pscore &gt;= 80 THEN<br>
+  vpan := '우수';<br>
+  ELSIF pscore &gt;= 60 THEN<br>
+  vpan := '보통';<br>
+  ELSE<br>
+  vpan := '불합격';<br>
+  END IF;</p>
+<p> UPDATE EXAM1 SET name=pname, score=pscore<br>
+  , pan=vpan WHERE id=pid;<br>
+  COMMIT;<br>
+  END;</p>
+<p>EXECUTE proUpdateExam1('이기자', 60, 1);<br>
+  SELECT * FROM EXAM1;</p>
+<p>-- 삭제 프로시저 작성<a name="1315"></a><br>
+  CREATE OR REPLACE PROCEDURE proDeleteExam1<br>
+  (<br>
+  pid IN exam1.id%TYPE<br>
+  )<br>
+  IS<br>
+  BEGIN<br>
+  DELETE FROM EXAM1 WHERE id=pid;<br>
+  COMMIT;<br>
+  END;</p>
+<p>EXECUTE proDeleteExam1(1);<br>
+  SELECT * FROM EXAM1;</p>
+<p><br>
+  -- 프로시저 실습</p>
+<p>------------------------------------------------------------------<br>
+  -- 테이블이 존재하면 테이블 삭제<br>
+  DROP TABLE mem2 PURGE;<br>
+  DROP TABLE mem1 PURGE;</p>
+<p>------------------------------------------------------------------<br>
+  CREATE TABLE mem1 (<br>
+  id VARCHAR2(20) NOT NULL PRIMARY KEY<br>
+  ,pwd VARCHAR2(20) NOT NULL<br>
+  ,name VARCHAR2(20) NOT NULL<br>
+  );</p>
+<p>CREATE TABLE mem2 (<br>
+  id VARCHAR2(20) NOT NULL PRIMARY KEY<br>
+  ,birth DATE<br>
+  ,tel VARCHAR2(20)<br>
+  ,CONSTRAINT fk_mem2_id FOREIGN KEY(id)<br>
+  REFERENCES mem1(id)<br>
+  );</p>
+<p>------------------------------------------------------------------<br>
+  SELECT constraint_name, table_name,<br>
+  r_constraint_name, constraint_type<br>
+  FROM user_constraints;</p>
+<p><br>
+  -- 출력용 View 작성<a name="1316"></a><br>
+  CREATE OR REPLACE VIEW memberView<br>
+  AS<br>
+  SELECT mem1.id, pwd, name, birth, tel<br>
+  FROM mem1 LEFT OUTER JOIN mem2 ON mem1.id=mem2.id;</p>
+<p>SELECT * FROM memberView;</p>
+<p>-----------------<a name="1317"></a>-------------------------------------------------<br>
+  -- 추가 프로시져<br>
+  CREATE OR REPLACE PROCEDURE proInsMember<br>
+  (<br>
+  pid IN mem1.id%TYPE<br>
+  ,ppwd IN mem1.pwd%TYPE<br>
+  ,pname IN mem1.name%TYPE<br>
+  ,pbirth IN mem2.birth%TYPE<br>
+  ,ptel IN mem2.tel%TYPE<br>
+  )<br>
+  IS<br>
+  BEGIN<br>
+  INSERT INTO mem1 (id, pwd, name) VALUES (pid, ppwd, pname);</p>
+<p> IF pbirth IS NOT NULL OR ptel IS NOT NULL THEN<br>
+  INSERT INTO mem2 (id, birth, tel) VALUES (pid, pbirth, ptel);<br>
+  END IF;<br>
+  COMMIT;<br>
+  END;</p>
+<p>------------------------------------------------------------------<br>
+  -- 테스트<br>
+  EXECUTE proInsMember('1111', '1111', '홍길동', NULL, NULL);<br>
+  EXECUTE proInsMember('2222', '2222', '홍길동', '', '');<br>
+  EXECUTE proInsMember('3333', '3333', '이순신', NULL, '');<br>
+  EXECUTE proInsMember('4444', '4444', '이순신', '2000-10-10', '');<br>
+  EXECUTE proInsMember('1111', '4444', '이순신', '2000-10-10', '111-111');<br>
+  -- 오류<br>
+  EXECUTE proInsMember('5555', '6666', '허허허', '2000-10-10', '111-111');<br>
+  EXECUTE proInsMember('6666', '6666', '후후후후', NULL, '111-111');</p>
+<p>SELECT * FROM mem1;<br>
+  SELECT * FROM mem2;</p>
+<p>EXECUTE proInsMember('4444', '4444', '이순신', '2000-10-10', '');</p>
+<p>------------------------------------------------------------------<br>
+  -- 수정 프로시져 - 1<a name="1318"></a><br>
+  CREATE OR REPLACE PROCEDURE proUpMember<br>
+  (<br>
+  pid IN mem1.id%TYPE<br>
+  ,ppwd IN mem1.pwd%TYPE<br>
+  ,pname IN mem1.name%TYPE<br>
+  ,pbirth IN mem2.birth%TYPE<br>
+  ,ptel IN mem2.tel%TYPE<br>
+  )<br>
+  IS<br>
+  vCount NUMBER;<br>
+  BEGIN<br>
+  SELECT COUNT(*) INTO vCount FROM mem2 WHERE id=pid;</p>
+<p> UPDATE mem1 SET pwd=ppwd, name=pname WHERE id=pid;</p>
+<p> IF pbirth IS NOT NULL OR ptel IS NOT NULL THEN<br>
+  IF vCount=1 THEN<br>
+  UPDATE mem2 SET birth=pbirth, tel=ptel WHERE id=pid;<br>
+  ELSE<br>
+  INSERT INTO mem2 (id, birth, tel) VALUES (pid, pbirth, ptel);<br>
+  END IF;<br>
+  ELSE<br>
+  DELETE FROM mem2 WHERE id=pid;<br>
+  END IF;</p>
+<p> COMMIT;<br>
+  END;</p>
+<p>------------------------------------------------------------------<br>
+  -- 수정 테스트<br>
+  EXECUTE proUpMember('5555', '4444', '이순신', '', '');<br>
+  EXECUTE proUpMember('3333', '7777', '이이이', '2010-10-10', '');</p>
+<p>------------------------------------------------------------------<br>
+  -- 수정 프로시져 - 2<a name="1319"></a><br>
+  CREATE OR REPLACE PROCEDURE proUpMember<br>
+  (<br>
+  pid IN mem1.id%TYPE<br>
+  ,ppwd IN mem1.pwd%TYPE<br>
+  ,pname IN mem1.name%TYPE<br>
+  ,pbirth IN mem2.birth%TYPE<br>
+  ,ptel IN mem2.tel%TYPE<br>
+  )<br>
+  IS<br>
+  vid mem1.id%TYPE;</p>
+<p> CURSOR mem_list IS SELECT id FROM mem2 WHERE id = pid;<br>
+  BEGIN<br>
+  UPDATE mem1 SET pwd=ppwd, name=pname WHERE id=pid;</p>
+<p> OPEN mem_list;<br>
+  FETCH mem_list INTO vid;</p>
+<p> IF pbirth IS NOT NULL OR ptel IS NOT NULL THEN<br>
+  IF mem_list%FOUND THEN<br>
+  UPDATE mem2 SET birth=pbirth, tel=ptel WHERE id=pid;<br>
+  ELSE<br>
+  INSERT INTO mem2 (id, birth, tel) VALUES (pid, pbirth, ptel);<br>
+  END IF;<br>
+  ELSE<br>
+  DELETE FROM mem2 WHERE id=pid;<br>
+  END IF;</p>
+<p> COMMIT;<br>
+  END;</p>
+<p>------------------------------------------------------------------<br>
+  -- 삭제 프로시져 <a name="1320"></a><br>
+  CREATE OR REPLACE PROCEDURE proDelMember<br>
+  (<br>
+  pid IN mem1.id%TYPE<br>
+  )<br>
+  IS<br>
+  BEGIN<br>
+  DELETE FROM mem2 WHERE id=pid;<br>
+  DELETE FROM mem1 WHERE id=pid;<br>
+  COMMIT;<br>
+  END;</p>
+<p>EXECUTE proDelMember('3333');<br>
+</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><strong>13-2. 프로시져 문제</strong> </p>
+<p>-- 테이블 작성<a name="1321"></a><br>
+  -- 엔티티명 : mem1, 엔티티성격 : 테이블<br>
+-- 컬럼<br>
+userId 문자(10) NOT NULL<br>
+userPwd 문자(10) NOT NULL<br>
+userName 문자(20) NOT NULL<br>
+userId는 기본키</p>
+<p>CREATE TABLE mem1(<br>
+  userId VARCHAR2(10) NOT NULL<br>
+  ,userPwd VARCHAR2(10) NOT NULL<br>
+  ,userName VARCHAR2(20) NOT NULL<br>
+  ,CONSTRAINT pk_mem1_userId PRIMARY KEY (userId)<br>
+  );<br>
+</p>
+<p>-- 엔티티명 : mem2, 엔티티성격 : 테이블<br>
+  userId 문자(10) NOT NULL<br>
+  userSsn 문자(14)<br>
+  userTel 문자(20)<br>
+  userBirth 날짜<br>
+  userId 는 기본키이며 mem1 테이블의 userId의 참조키<br>
+  userSsn는 유니크</p>
+<p>CREATE TABLE mem2(<br>
+  userId VARCHAR2(7) NOT NULL<br>
+  ,userSsn VARCHAR2(14)<br>
+  ,userTel VARCHAR2(20)<br>
+  ,userBirth DATE<br>
+  ,CONSTRAINT pk_mem2_userId PRIMARY KEY (userId)<br>
+  ,CONSTRAINT uk_mem2_userSsn UNIQUE(userSsn)<br>
+  ,CONSTRAINT fk_mem2_userId FOREIGN KEY(userId)<br>
+  REFERENCES mem1(userId)<br>
+  );<br>
+</p>
+<p>-- 두 테이블에 추가하고 COMMIT 하고 SELECT 해볼것<br>
+  INSERT INTO mem1(userId, userPwd, userName) VALUES('11', '11', '자바');<br>
+  INSERT INTO mem1(userId, userPwd, userName) VALUES('22', '22', '오라클');</p>
+<p>INSERT INTO mem2(userId, userSSn, userTel, userBirth) VALUES('22', '', '010-111-1111', '2010-11-10');<br>
+  COMMIT;</p>
+<p>SELECT * FROM mem1;<br>
+  SELECT * FROM mem2;<br>
+</p>
+<p>-- mem1과 mem2를 조인(OUTER JOIN)하여 모든 컬럼을 출력하는 뷰를 작성한다.(memView)<br>
+  CREATE OR REPLACE VIEW memView<br>
+  AS<br>
+  SELECT mem1.userId, userName, userPwd, userSsn, <br>
+  userBirth, userTel FROM mem1<br>
+  LEFT OUTER JOIN mem2 ON mem1.userId=mem2.userId;</p>
+<p>SELECT * FROM memView;<br>
+</p>
+<p>-- mem1과 mem2에 데이터를 추가하는 프로시져를 작성한다.<a name="1322"></a><br>
+  (프로시져명 : memInsert)<br>
+  단, userSsn, userTel, userBirth 모두가 NULL인 경우에는 mem2 테이블에는 자료를 추가하지 않도록 한다.<br>
+  IF pUserSSn IS NOT NULL OR ..... THEN<br>
+  END IF;</p>
+<p> 이런식으로 하면 된다.</p>
+<p>CREATE OR REPLACE PROCEDURE memInsert<br>
+  (<br>
+  pUserId IN mem1.userId%TYPE<br>
+  ,pUserPwd IN mem1.userPwd%TYPE<br>
+  ,pUserName IN mem1.userName%TYPE<br>
+  ,pUserSsn IN mem2.userSsn%TYPE<br>
+  ,pUserTel IN mem2.userTel%TYPE<br>
+  ,pUserBirth IN mem2.userBirth%TYPE<br>
+  )<br>
+  IS<br>
+  BEGIN<br>
+  INSERT INTO mem1 (userId, userPwd, userName) VALUES (pUserId, pUserPwd, pUserName);</p>
+<p> IF pUserSsn IS NOT NULL OR pUserBirth IS NOT NULL OR pUserTel IS NOT NULL THEN<br>
+  INSERT INTO mem2 (userId, userSsn, userBirth, userTel) VALUES<br>
+  (pUserId, pUserSsn, pUserBirth, pUserTel);<br>
+  END IF;<br>
+  COMMIT;<br>
+  END;</p>
+<p>EXEC memInsert('111','111','김병태',null,null,'200-10-10');<br>
+  EXEC memInsert('222','222','공현일','','','');<br>
+  EXEC memInsert('333','333','최연지','111-111','010','2010-10-10');</p>
+<p>SELECT * FROM memView;<br>
+</p>
+<p>-- mem1과 mem2에 데이터를 삭제하는 프로시져를 작성한다.<a name="1323"></a><br>
+  (프로시져명 : memDelete)</p>
+<p>CREATE OR REPLACE PROCEDURE memDelete<br>
+  (<br>
+  pUserId IN mem1.userId%TYPE<br>
+  )<br>
+  IS<br>
+  BEGIN<br>
+  DELETE FROM mem2 WHERE userId=pUserId;<br>
+  DELETE FROM mem1 WHERE userId=pUserId;<br>
+  COMMIT;<br>
+  END;</p>
+<p>EXEC memDelete('22');</p>
+<p>SELECT * FROM memView;<br>
+</p>
+<p>-- mem1과 mem2에 데이터를 수정하는 프로시져를 작성한다.<a name="1324"></a><br>
+  (프로시져명 : memUpdate)<br>
+  단, userSsn, userTel, userBirth 모두가 NULL이면서 mem2테이블에 자료가 존재하면 mem2테이블의 자료를 삭제하고 userSsn, userTel, userBirth 중 하나라도 NULL이 아니면서 mem2테이블에 자료가 존재하면 수정하고 존재하지 않으면 추가한다.</p>
+<p>CREATE OR REPLACE PROCEDURE memUpdate<br>
+  (<br>
+  pUserId IN mem1.userId%TYPE<br>
+  ,pUserPwd IN mem1.userPwd%TYPE<br>
+  ,pUserName IN mem1.userName%TYPE<br>
+  ,pUserSsn IN mem2.userSsn%TYPE<br>
+  ,pUserTel IN mem2.userTel%TYPE<br>
+  ,pUserBirth IN mem2.userBirth%TYPE<br>
+  )<br>
+  IS<br>
+  vCount NUMBER;</p>
+<p>BEGIN<br>
+  SELECT COUNT(*) INTO vCount FROM mem2 WHERE userId = pUserId;<br>
+  <br>
+  UPDATE mem1 SET userPwd=pUserPwd, userName=puserName WHERE userId=pUserId;</p>
+<p> IF pUserSsn IS NOT NULL OR pUserBirth IS NOT NULL OR pUserTel IS NOT NULL THEN<br>
+  IF vCount!=0 THEN<br>
+  UPDATE mem2 SET userSsn=pUserSsn, userBirth=pUserBirth, userTel=pUserTel WHERE userId=pUserId;<br>
+  ELSE<br>
+  INSERT INTO mem2 (userId, userSsn, userBirth, userTel) VALUES (pUserId, pUserSsn, pUserBirth, pUserTel);<br>
+  END IF;<br>
+  ELSE<br>
+  DELETE FROM mem2 WHERE userId=pUserId;<br>
+  END IF;</p>
+<p> COMMIT;<br>
+  END;</p>
+<p>EXEC memUpdate('11','111','프로시져',null,null,'200-10-10');</p>
+<p>SELECT * FROM memView;</p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p><strong>14. 사용자 정의 함수</strong> <br>
+  <br>
+  -- Stored Function(사용자 함수)<a name="141"></a><br>
+스토어드 함수는 시스템 함수처럼 쿼리에서 호출하거나 저장 프로시저처럼 EXECUTE 문을 통해 실행할 수 있다.</p>
+<p>-- 형식(인수나 RETURN 에서는 자료형의 크기를 명시하지 않는다.)<a name="142"></a><br>
+  CREATE [OR REPLACE] FUNCTION 함수이름<br>
+  [(<br>
+  매개변수1 IN 자료형,<br>
+  매개변수2 IN 자료형;<br>
+  )]<br>
+  RETURN datatype;<br>
+  IS <br>
+  [변수의 선언]<br>
+  BEGIN<br>
+  .............<br>
+  RETURN (값);<br>
+  [EXCEPTION]<br>
+  .............<br>
+  END;</p>
+<p>-- 함수 목록 확인<a name="143"></a><br>
+  SELECT object_name FROM user_procedures;</p>
+<p>-- 합을 구하는 함수 만들기<a name="144"></a><br>
+  CREATE OR REPLACE FUNCTION fnSum<br>
+  (<br>
+  n IN NUMBER<br>
+  )<br>
+  RETURN NUMBER -- 인수나 RETURN 에서는 자료형의 크기를 명시하지 않는다.<br>
+  IS<br>
+  s NUMBER := 0;<br>
+  BEGIN<br>
+  FOR i IN 1..n LOOP<br>
+  s := s + i;<br>
+  END LOOP;<br>
+  RETURN (s);<br>
+  END;</p>
+<p>SELECT fnSUM(100) FROM DUAL;</p>
+<p>-----------------------------------------------------<br>
+  -- fnPow(10, 2) : 10의 2승<a name="145"></a><br>
+  CREATE OR REPLACE FUNCTION fnPow<br>
+  (<br>
+  n1 IN NUMBER<br>
+  ,n2 IN NUMBER<br>
+  )<br>
+  RETURN NUMBER<br>
+  IS<br>
+  s NUMBER := 1;<br>
+  BEGIN<br>
+  IF n2 &gt; 0 THEN<br>
+  FOR i IN 1..n2 LOOP<br>
+  s := s * n1;<br>
+  END LOOP;<br>
+  ELSE<br>
+  FOR i IN 1..(-n2) LOOP<br>
+  s := s / n1;<br>
+  END LOOP;<br>
+  END IF;<br>
+  RETURN s;<br>
+  END;</p>
+<p>SELECT fnPow(2, 10), fnPow(2, -2) FROM DUAL;</p>
+<p>-- 주민번호가지고 성별 구하기 또는 생일, 나이등 계산<a name="146"></a></p>
+<p><br>
+  -- 성별<br>
+  CREATE OR REPLACE FUNCTION fnSex<br>
+  (<br>
+  ssn IN VARCHAR2<br>
+  )<br>
+  RETURN VARCHAR2<br>
+  IS<br>
+  s VARCHAR2(4) := '여자';<br>
+  BEGIN<br>
+  IF MOD(SUBSTR(ssn, 8, 1), 2)=1 THEN<br>
+  s := '남자';<br>
+  END IF;<br>
+  RETURN s;<br>
+END;</p>
+<p><br>
+  -- 생일<br>
+  CREATE OR REPLACE FUNCTION fnBirth<br>
+  (<br>
+  ssn IN VARCHAR2<br>
+  )<br>
+  RETURN DATE<br>
+  IS<br>
+  s VARCHAR2(8);<br>
+  BEGIN<br>
+  s := '19' || SUBSTR(ssn, 1, 6);<br>
+  IF SUBSTR(ssn, 8, 1) IN ('3', '4') THEN<br>
+  s := '20' || SUBSTR(ssn, 1, 6);<br>
+  END IF;<br>
+  RETURN TO_DATE(s, 'YYYYMMDD');<br>
+END;</p>
+<p><br>
+  -- 나이<br>
+  CREATE OR REPLACE FUNCTION fnAge<br>
+  (<br>
+  ssn IN VARCHAR2<br>
+  )<br>
+  RETURN NUMBER<br>
+  IS<br>
+  s VARCHAR2(8);<br>
+  age NUMBER;<br>
+  BEGIN<br>
+  s := '19' || SUBSTR(ssn, 1, 6);<br>
+  IF SUBSTR(ssn, 8, 1) IN ('3', '4') THEN<br>
+  s := '20' || SUBSTR(ssn, 1, 6);<br>
+  END IF;<br>
+  age := TRUNC(MONTHS_BETWEEN(SYSDATE, TO_DATE(s, 'YYYYMMDD')) /12);<br>
+  RETURN age;<br>
+END;</p>
+<p><br>
+SELECT name, fnSex(ssn), fnBirth(ssn), fnAge(ssn) FROM INSA;</p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p><strong>15. 커서와 동적 SQL</strong><br>
+  <br>
+  -- 커서(Cursor)<a name="151"></a><br>
+-- 하나의 레코드가 아닌 여러 레코드로 구성된 작업영역에서 SQL문을 실행하고 그 과정에 생긴 정보를 저장하기 위해서 CURSOR를 사용</p>
+<p> 1. 암시적인 커서<a name="152"></a><br>
+  암시적인 커서는 오라클이나 PL/SQL실행 메커니즘에 의해 처리되는 SQL문장이 처리되는 곳에 대한 익명의 address로 오라클 데이터베이스에서 실행되는 모든 SQL문장은 암시적인 커서이며, 암시적인 커서 속성이 사용될 수 있다.</p>
+<p> -- 암시적 커서의 속성<a name="153"></a><br>
+  SQL%ROWCOUNT : 해당 SQL 문에 영향을 받는 행의 수<br>
+  SQL%FOUND : 해당 SQL 영향을 받는 행의 수가 1개 이상일 경우 TRUE<br>
+  SQL%NOTFOUND : 해당 SQL 문에 영향을 받는 행의 수가 없을 경우 TRUE<br>
+  SQL%ISOPEN : 항상 FALSE, 암시적 커서가 열려 있는지의 여부 검색</p>
+<p> 2. 명시적(explicit) 커서<a name="154"></a><br>
+  명시적 커서는 프로그래머에 의해 선언되며 이름이 있는 커서로 여러 row를 다룰 수 있다.</p>
+<p> -- 작업 순서<a name="155"></a><br>
+  CURSOR 선언 → 커서 OPEN → FETCH → 커서 CLOSE</p>
+<p> -- 커서 선언<a name="156"></a><br>
+  CURSOR 커서이름 IS [SELECT 문];</p>
+<p> 실행하고자 하는 SELECT문을 작성 한다.</p>
+<p> -- 커서 OPEN<a name="157"></a><br>
+  OPEN 커서이름;</p>
+<p> OPEN은 커서에서 선언된 SELECT문의 실행을 의미 한다.<br>
+    <br>
+  -- FETCH<a name="158"></a><br>
+  LOOP<br>
+  FETCH 커서이름 INTO variable1, variable2 ;<br>
+  EXIT WHEN [조건];<br>
+  END LOOP;</p>
+<p> OPEN된 SELECT 문에 의해 검색된 하나의 행 정보를 읽어 OUT 변수에 대입한다. 만약 리턴 되는<br> 
+결과가 여러 개인 경우 LOOP ~ END LOOP와 같은 반복문을 이용하여 마지막 행이 읽혀질 때까지 계속 읽게 된다.</p>
+<p> -- 커서 CLOSE<a name="159"></a><br>
+  CLOSE 커서이름;</p>
+<p> 선언된 SELECT문의 선언을 해제 한다.</p>
+<p>3. FOR문에서 커서 사용(Cursor FOR Loops)<a name="1510"></a><br>
+  FOR문을 사용하면 커서의 OPEN, FETCH, CLOSE가 자동 발생하므로 따로 기술할 필요가 없고 레코드 <br>
+  이름도 자동 선언되므로 따로 선언할 필요가 없다.</p>
+<p> -- 형식<a name="1511"></a><br>
+  FOR 레코드이름 IN 커서이름 LOOP<br>
+  문장;<br>
+  ......<br>
+  END LOOP;</p>
+<p>4. WHERE CURRENT OF<a name="1512"></a><br>
+  FETCH문에 의해 가장 최근에 처리된 행을 참조하기 위해서 &quot;WHERE CURRENT OF 커서이름 &quot; 절로 DELETE나 UPDATE문 작성이 가능하다. 이 절을 사용하기 위해서는 참조하는 커서가 있어야 하며, FOR UPDATE절이 커서 선언 query문장 안에 있어야 한다.</p>
+<p>-----------------------------------------------------<br>
+  DECLARE<br>
+  vName insa.name%TYPE;<br>
+  vBasicPay insa.basicpay%TYPE;</p>
+<p> CURSOR insa_list IS<br>
+  SELECT name, basicpay FROM insa;</p>
+<p> BEGIN<br>
+  OPEN insa_list;<br>
+  LOOP<br>
+  FETCH insa_list INTO vName, vBasicpay;<br>
+  -- EXIT WHEN insa_list%NOTFOUND;<br>
+  DBMS_OUTPUT.PUT_LINE(vName || ' ' || vbasicpay);<br>
+  EXIT WHEN vName = '이기자';<br>
+  END LOOP;</p>
+<p> CLOSE insa_list;<br>
+  END;<br>
+  /</p>
+<p>-----------------------------------------------------<br>
+  CREATE OR REPLACE PROCEDURE curTest<br>
+  IS<br>
+  vName insa.name%TYPE;<br>
+  vBasicPay insa.basicpay%TYPE;<br>
+  CURSOR insa_list IS<br>
+  SELECT name, basicpay FROM insa;<br>
+  BEGIN<br>
+  OPEN insa_list;<br>
+  LOOP<br>
+  FETCH insa_list INTO vName, vBasicpay;<br>
+  EXIT WHEN insa_list%NOTFOUND;<br>
+  DBMS_OUTPUT.PUT_LINE(vName || ' ' || vbasicpay);<br>
+  END LOOP;<br>
+  CLOSE insa_list;<br>
+  END;<br>
+  /<br>
+  EXECUTE curTest</p>
+<p>-----------------------------------------------------<br>
+  -- 조건 만족 데이터 가져오기<a name="1513"></a><br>
+  CREATE OR REPLACE PROCEDURE curTest<br>
+  (<br>
+  pcity insa.city%TYPE<br>
+  )<br>
+  IS<br>
+  vName insa.name%TYPE;<br>
+  vBasicPay insa.basicpay%TYPE;<br>
+  vCity insa.city%TYPE;<br>
+  CURSOR insa_list IS<br>
+  SELECT name, basicpay,city FROM insa WHERE city=pcity;<br>
+  BEGIN<br>
+  OPEN insa_list;<br>
+  LOOP<br>
+  FETCH insa_list INTO vName, vBasicpay, vCity;<br>
+  EXIT WHEN insa_list%NOTFOUND;<br>
+  DBMS_OUTPUT.PUT_LINE(vName || ' ' || vbasicpay || ' ' vcity);<br>
+  END LOOP;<br>
+  CLOSE insa_list;<br>
+  END;<br>
+  /<br>
+  EXECUTE curTest('서울');</p>
+<p>-----------------------------------------------------<br>
+  -- 커서에서 FOR : 자동 OPEN, 자동 CLOSE<a name="1514"></a><br>
+  CREATE OR REPLACE PROCEDURE curTest<br>
+  IS<br>
+  CURSOR insa_list IS<br>
+  SELECT * FROM insa;<br>
+  BEGIN<br>
+  FOR rec IN insa_list LOOP<br>
+  DBMS_OUTPUT.PUT_LINE(rec.Name || ' ' || rec.basicpay);<br>
+  END LOOP;<br>
+  END;<br>
+  EXECUTE curTest</p>
+<p>-----------------------------------------------------<br>
+  -- 파라미터가 있는 커서<a name="1515"></a><br>
+  CREATE OR REPLACE PROCEDURE CURTEST<br>
+  (<br>
+  pcity INSA.CITY%TYPE<br>
+  )<br>
+  IS<br>
+  vName insa.name%TYPE;<br>
+  vBasicPay insa.basicpay%TYPE;</p>
+<p> CURSOR insa_list(ppcity INSA.CITY%TYPE) IS<br>
+  SELECT name, basicpay FROM INSA WHERE city=ppcity;</p>
+<p>BEGIN<br>
+  OPEN insa_list(pcity);<br>
+  LOOP<br>
+  FETCH insa_list INTO vName, vBasicpay;<br>
+  EXIT WHEN insa_list%NOTFOUND;<br>
+  DBMS_OUTPUT.PUT_LINE(vName || ' ' || vbasicpay);<br>
+  END LOOP;<br>
+  CLOSE insa_list;<br>
+  END;</p>
+<p>EXECUTE CURTEST('서울');<br>
+</p>
+<p>  -- SYS_REFCURSOR<a name="1516"></a><br>
+  -- REF CURSOR : 9i 이전<br>
+-- SYS_REFCURSOR : 9i 이후</p>
+<p> -- 테이블의 여러 로우를 반복적으로 조회하기 위해 레퍼런스 커서(reference cursor)를 사용한다.</p>
+<p>-----------------------------------------------------<br>
+  -- 테이블 작성<a name="1517"></a><br>
+  CREATE TABLE score(<br>
+  num NUMBER(7) PRIMARY KEY NOT NULL<br>
+  ,name VARCHAR2(20)<br>
+  ,birth DATE<br>
+  ,kor NUMBER(3)<br>
+  ,eng NUMBER(3)<br>
+  ,mat NUMBER(3)<br>
+  );<br>
+  INSERT INTO score (num, name, birth, kor, eng, mat)<br>
+  VALUES (1, '홍길동', '2000-10-10', 80, 80, 80);<br>
+  INSERT INTO score (num, name, birth, kor, eng, mat)<br>
+  VALUES (2, '이기자', '2000-11-11', 90, 50, 50);<br>
+  COMMIT;</p>
+<p>-----------------------------------------------------<br>
+  -- 프로시져 - 1<a name="1518"></a><br>
+  CREATE OR REPLACE PROCEDURE select_score<br>
+  (<br>
+  pRc IN sys_refcursor<br>
+  )<br>
+  IS<br>
+  varNum SCORE.num%TYPE;<br>
+  varName SCORE.name%TYPE;<br>
+  varBirth SCORE.birth%TYPE;<br>
+  varKor SCORE.kor%TYPE;<br>
+  varEng SCORE.eng%TYPE;<br>
+  varMat SCORE.mat%TYPE;<br>
+  BEGIN<br>
+  LOOP<br>
+  FETCH pRc INTO varNum, varName, varBirth,<br>
+  varKor, varEng, varMat;<br>
+  EXIT WHEN pRc%NOTFOUND;<br>
+  DBMS_OUTPUT.PUT_LINE(varNum || ' ' ||<br>
+  varName || ' ' || (varKor+varEng+varMat));<br>
+  END LOOP;<br>
+  END;</p>
+<p>-----------------------------------------------------<br>
+  -- 프로시져 - 2<a name="1519"></a><br>
+  CREATE OR REPLACE PROCEDURE list_score<br>
+  IS<br>
+  pResult SYS_REFCURSOR;<br>
+  BEGIN<br>
+  OPEN pResult FOR SELECT num, name, <br>
+  birth, kor, eng, mat FROM score;<br>
+  select_score(pResult);<br>
+  CLOSE pResult;<br>
+  END;</p>
+<p>-- 실행<br>
+  EXEC list_score;<br>
+</p>
+<p>  -- 동적 SQL<a name="1520"></a><br>
+응용 프로그램 개발 시 자주 실행되는 SQL문이 존재할 때 정적 SQL문을 이용하여 구현하는 경우 여러 번 반복 작성 실행해야 한다.</p>
+<p> -- 주의<br>
+  RESOURCE 롤은 테이블을 생성할 수 있지만 동적 SQL을 이용하여 테이블을 생성할수 는 없다. 동적 SQL로 테이블을 생성하기 위해서는 CREATE TABLE 권한을 설정 해 주어야 한다.</p>
+<p> -- SYS 계정<br>
+  cmd&gt;sqlplus sys/&quot;암호&quot; AS sysdba;<br>
+  sql&gt;GRANT CREATE TABLE TO 사용자;</p>
+<p>------------------------------------------------------------<br>
+  EXECUTE IMMEDIATE dynamic_sql_string<br>
+  [INTO {define_var1 [, define_var2] ... | plsql_record }]<br>
+  [USING [IN | OUT | IN OUT] bind_arg1 [,<br>
+  [IN | OUT | IN OUT] bind_arg2] ...]; </p>
+<p>------------------------------------------------------------<br>
+  -- 동적으로 테이블 생성<a name="1521"></a><br>
+  CREATE OR REPLACE PROCEDURE dynTest1<br>
+  (<br>
+  pTname VARCHAR2<br>
+  )<br>
+  IS<br>
+  sql_stmt VARCHAR2(4000);<br>
+  BEGIN<br>
+  sql_stmt:='CREATE TABLE ' || pTname;<br>
+  sql_stmt:=sql_stmt || '(num NUMBER PRIMARY KEY,';<br>
+  sql_stmt:=sql_stmt || ' name VARCHAR2(20) )';</p>
+<p> -- 동적으로 쿼리 실행<br>
+  FOR temp IN (SELECT TNAME FROM TAB WHERE TNAME = UPPER(pTname)) LOOP<br>
+  EXECUTE IMMEDIATE 'DROP TABLE '||pTname||' PURGE';<br>
+  DBMS_OUTPUT.PUT_LINE('테이블 삭제........');<br>
+  EXIT;<br>
+  END LOOP;<br>
+  EXECUTE IMMEDIATE sql_stmt;<br>
+  DBMS_OUTPUT.PUT_LINE('테이블 생성........');<br>
+  END;</p>
+<p>EXEC dynTest1('xyz');</p>
+<p>------------------------------------------------------------<br>
+  -- 두번째 예제<a name="1522"></a><br>
+  CREATE OR REPLACE PROCEDURE dynTest2<br>
+  IS<br>
+  sql_stmt VARCHAR2(200);<br>
+  v_id NUMBER;<br>
+  a_id NUMBER;<br>
+  v_memo VARCHAR2(20);</p>
+<p> TYPE MyType IS RECORD<br>
+  (<br>
+  t_id NUMBER,<br>
+  t_memo VARCHAR2(20)<br>
+  );<br>
+  rec MyType;</p>
+<p>BEGIN<br>
+  -- 테이블이 존재하면 삭제<br>
+  FOR temp IN (SELECT TNAME FROM TAB WHERE TNAME = 'TEST') LOOP<br>
+  EXECUTE IMMEDIATE 'DROP TABLE TEST';<br>
+  EXIT;<br>
+  END LOOP;</p>
+<p>------------------------------------------------------------<br>
+  -- 테이블 작성<br>
+  EXECUTE IMMEDIATE 'CREATE TABLE Test (t_id NUMBER, t_memo VARCHAR2(20))';</p>
+<p>------------------------------------------------------------<br>
+  -- 자료 입력<br>
+  sql_stmt := 'INSERT INTO test VALUES(:1, :2)';<br>
+  FOR n IN 1..5 LOOP<br>
+  v_id := n;<br>
+  v_memo := CHR(n+96);</p>
+<p> EXECUTE IMMEDIATE sql_stmt USING v_id, v_memo;<br>
+  END LOOP;<br>
+  COMMIT;</p>
+<p>------------------------------------------------------------<br>
+  -- 자료 출력<br>
+  sql_stmt := 'SELECT * FROM Test WHERE t_id = :id';<br>
+  a_id := 1;<br>
+  EXECUTE IMMEDIATE sql_stmt INTO rec USING a_id;</p>
+<p> DBMS_OUTPUT.PUT_LINE(rec.t_id || ' ' || rec.t_memo);</p>
+<p>------------------------------------------------------------<br>
+  -- 자료 수정(변경 값을 a_id에 가져옴)<br>
+  v_id := 1;<br>
+  sql_stmt := 'UPDATE Test SET t_id = 100 WHERE t_id = :1 RETURNING t_id INTO :2';<br>
+  EXECUTE IMMEDIATE sql_stmt USING v_id RETURNING INTO a_id;<br>
+  COMMIT;<br>
+  DBMS_OUTPUT.PUT_LINE(a_id || ' 으로 ID 변경');</p>
+<p>------------------------------------------------------------<br>
+  -- 자료 삭제<br>
+  v_id := 3;<br>
+  sql_stmt := 'DELETE FROM Test WHERE t_id = :id';<br>
+  EXECUTE IMMEDIATE sql_stmt USING v_id;<br>
+  COMMIT;<br>
+  END;</p>
+<p>EXEC dynTest2;<br>
+</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><strong>16-1. 트리거<br> 
+  </strong><br>
+   트리거(TRIGGER)<a name="161"></a><br>
+TRIGGER란 DML 작업 즉, INSERT, DELETE, UPDATE 작업이 일어날 때 자동으로 실행되는 객체로 특히 이런 TRIGGER를 DML TRIGGER라 한다. TRIGGER는 데이터의 무결성 뿐만 아니라 다음과 같은 작업에도 사용된다.<br>
+트리거 내에서는 COMMIT, ROLLBACK 문을 사용할 수 없다.</p>
+<p> -- 문장 트리거(문장당 한번만 실행)<a name="162"></a><br>
+  트리거가 설정된 테이블에 트리거 이벤트가 발생하면 많은 행에 대해 변경 작업이 발생하더라도 오직 한번만 트리거를 발생시키는 방법</p>
+<p> -- 행 트리거<a name="163"></a><br>
+  조건을 만족하는 여러 개의 행에 대해 트리거를 반복적으로 여러 번 수행하는 방법으로 [FOR EACH ROW WHEN 조건]절 정의된다.</p>
+<p> -- 형식<a name="164"></a><br>
+  CREATE [OR REPLACE] TRIGGER 트리거명 [BEFORE | AFTER]<br>
+  이벤트-1 [OR 이벤트-2 OR 이벤트-3] ON 테이블명<br>
+  [FOR EACH ROW [WHEN TRIGGER 조건]]<br>
+  DECLARE<br>
+  선언문<br>
+  BEGIN<br>
+  PL/SQL 코드<br>
+  END;</p>
+<p> -- 이벤트<a name="165"></a><br>
+  INSERT, UPDATE, DELETE</p>
+<p> -- BEFORE : 구문을 실행하기 전에 트리거를 시작<br>
+  -- AFTER : 구문을 실행한 후에 트리거를 시작<br>
+  -- FOR EACH ROW : 행 트리거임을 알림<br>
+  -- WHEN 조건 : 사용자의 트리거 이벤트 중에 조건에 만족하는 데이터만 트리거 한다.<br>
+  -- REFERENCING : 영향 받는 행의 값을 참조<br>
+  -- :OLD : 참조 전 열의 값(INSERT : 입력 전 자료, UPDATE : 수정 전 자료, DELETE : 삭제할 자료)<br>
+  -- :NEW : 참조 후 열의 값(INSERT : 입력할 자료, UPDATE : 수정할 자료)</p>
+<p> ROW 트리거에서 컬럼의 실제 데이터 값을 제어하는데 사용하는 연산자는 :OLD와 :NEW 의사 레코드이다. 이 연산자와 함께 컬럼 명을 함께 기술한다. 예를 들어, 컬럼명이 sal이라고 하면, 변경전의 값은 :OLD.sal이고 변경 후의 값은 :NEW.sal 처럼 표기한다.</p>
+<p> 문장 트리거에서는 :NEW, :OLD 를 참조 할 수 없다.</p>
+<p> -- 트리거 상태 확인<a name="166"></a><br>
+  SQL&gt;SELECT trigger_name, trigger_type, table_name FROM user_triggers;</p>
+<p> -- 트리거 삭제<a name="167"></a><br>
+  DROP TRIGGER 트리거명;<br>
+  <br>
+  <br>
+  -- 권한설정<a name="168"></a><br>
+  -- SYS 계정<br>
+  -- 사용자에게 트리거를 만들 수 있는 권한 부여<br>
+GRANT CREATE TRIGGER TO 사용자명;</p>
+<p>-- 사용자 계정<br>
+  -- 부여된 권한 확인<br>
+  SELECT * FROM USER_SYS_PRIVS;<br>
+</p>
+<p>  -- 문장 트리거 예제 <br>
+  SELECT * FROM tab;</p>
+<p>-- EXAM1 테이블이 존재하면 삭제<br>
+  DROP TABLE EXAM1 PURGE;</p>
+<p>-- 문장 트리거<br>
+  CREATE TABLE EXAM1 (<br>
+  id NUMBER PRIMARY KEY<br>
+  ,name VARCHAR2(20)<br>
+  );</p>
+<p>CREATE TABLE EXAM2 (<br>
+  memo VARCHAR2(100)<br>
+  ,ilja DATE DEFAULT SYSDATE<br>
+  );</p>
+<p>------------------------------------------------------------<br>
+  -- exam1 테이블에 추가, 수정, 삭제가되면 시간과 상태 저장 트리거<a name="169"></a><br>
+  -- 문장, AFTER 트리거<br>
+  CREATE OR REPLACE TRIGGER trgExam<br>
+  AFTER DELETE OR INSERT OR UPDATE ON EXAM1<br>
+  BEGIN<br>
+  IF INSERTING THEN<br>
+  INSERT INTO EXAM2(memo) VALUES ('추가');<br>
+  ELSIF UPDATING THEN<br>
+  INSERT INTO EXAM2(memo) VALUES ('수정');<br>
+  ELSIF DELETING THEN<br>
+  INSERT INTO EXAM2(memo) VALUES ('삭제');<br>
+  END IF;<br>
+  END;</p>
+<p>------------------------------------------------------------<br>
+  -- 트리거 확인<br>
+  SELECT trigger_name, trigger_type, table_name<br>
+  FROM user_triggers;<br>
+  SELECT TEXT FROM user_source;</p>
+<p>INSERT INTO EXAM1(id, name) VALUES(1, 'aaa');<br>
+  COMMIT;<br>
+  SELECT * FROM EXAM1;<br>
+  SELECT * FROM exam2;</p>
+<p>-- 테이블의 프로시저, 함수, 패키지 등 상호 참조되는 관계 확인<a name="1610"></a><br>
+  SELECT * FROM user_dependencies;</p>
+<p>  -- 날짜 표현 형식 변경<br>
+ALTER SESSION SET NLS_DATE_LANGUAGE='KOREAN';</p>
+<p>-- BEFORE 트리거<a name="1611"></a><br>
+  CREATE OR REPLACE TRIGGER trgExam1<br>
+  BEFORE DELETE OR INSERT OR UPDATE ON EXAM1<br>
+  BEGIN<br>
+  IF TO_CHAR(SYSDATE, 'DAY') IN ('토요일', '일요일')<br>
+  OR (TO_CHAR(SYSDATE, 'hh24') &gt;= 12 AND<br>
+  TO_CHAR(SYSDATE, 'hh24') &lt;= 13) THEN<br>
+  raise_application_error(-20007, '지금은 일못해');<br>
+  END IF;<br>
+  END;</p>
+<p>-- raise_application_error<a name="1612"></a><br>
+  -- 표준화되지 않은 에러 코드와 에러 메시지를 리턴하기 위해 raise_application_error 프로시저 사용<br>
+  -- 코드값은 -20000~-20999사이의 수 사용 </p>
+<p>INSERT INTO EXAM1(id, name) VALUES(5, 'bbb');<br>
+  SELECT * FROM EXAM1;<br>
+  SELECT * FROM exam2;</p>
+<p>-- 위 트리거 수정<br>
+  CREATE OR REPLACE TRIGGER trgExam1<br>
+  BEFORE DELETE OR INSERT OR UPDATE ON EXAM1<br>
+  BEGIN<br>
+  IF TO_CHAR(SYSDATE, 'DAY') IN ('토요일', '일요일')<br>
+  OR TO_CHAR(SYSDATE, 'hh24') &lt; 9 OR<br>
+  TO_CHAR(SYSDATE, 'hh24') &gt; 18 THEN<br>
+  raise_application_error(-20007, '지금은 일못해');<br>
+  END IF;<br>
+  END;</p>
+<p><br>
+  -- 테이블을 삭제하면 트리거도 자동적으로 지워진다.<br>
+</p>
+<p><br>
+  -- 행트리거<a name="1613"></a><br>
+  -- :NEW -&gt; 참조후 열의 값<br>
+  -- INSERT에 의해 새로 추가된(할) 레코드<br>
+  -- UPDATE에 의해 수정된(할) 레코드<br>
+  -- :OLD -&gt; 참조전 열의 값<br>
+  -- UPDATE에 의해 수정되기 전 레코드<br>
+-- DELETE에 의해 삭제된(할) 레코드</p>
+<p>------------------------------------------------------------<br>
+  CREATE TABLE demo1(<br>
+  id NUMBER,<br>
+  data VARCHAR2(20)<br>
+  );</p>
+<p>CREATE OR REPLACE TRIGGER demo_trigger<br>
+  BEFORE INSERT ON demo1 FOR EACH ROW<br>
+  BEGIN <br>
+  SELECT TO_CHAR(SYSDATE, 'YYYY') INTO :new.id FROM dual;<br>
+  END;<br>
+  /<br>
+  -- after 트리거는 :NEW를 수정 할 수 없다.</p>
+<p>INSERT INTO demo1(id, data) VALUES(5, '우리');<br>
+  COMMIT;</p>
+<p>------------------------------------------------------------<br>
+  CREATE TABLE exama(<br>
+  hak VARCHAR2(20) PRIMARY KEY<br>
+  ,name VARCHAR2(20)<br>
+  ,kor NUMBER<br>
+  ,eng NUMBER<br>
+  ,mat NUMBER<br>
+  );</p>
+<p>CREATE TABLE examb(<br>
+  hak VARCHAR2(20) PRIMARY KEY<br>
+  ,tot NUMBER<br>
+  ,ave NUMBER(5, 1)<br>
+  ,CONSTRAINT fk_examb_hak FOREIGN KEY(hak)<br>
+  REFERENCES exama(hak)<br>
+  );<br>
+</p>
+<p>-- 행 트리거(AFTER) : 추가<a name="1614"></a><br>
+  CREATE OR REPLACE TRIGGER triInsExama<br>
+  AFTER INSERT ON exama<br>
+  FOR EACH ROW<br>
+  DECLARE<br>
+  vtot NUMBER;<br>
+  vave NUMBER(5, 1);<br>
+  BEGIN<br>
+  vtot := :NEW.kor + :NEW.eng + :NEW.mat;<br>
+  vave := ROUND(vTOt/3, 1);</p>
+<p> INSERT INTO examb(hak, tot, ave)<br>
+  VALUES(:NEW.hak, vtot, vave);<br>
+  END;</p>
+<p>INSERT INTO exama(hak, name, kor, eng, mat) VALUES<br>
+  ('1111', '홍길동', 80, 80, 80);<br>
+  COMMIT;<br>
+  SELECT * FROM exama;<br>
+  SELECT * FROM examb;<br>
+</p>
+<p>-- 행 트리거(BEFORE) : 삭제<a name="1615"></a><br>
+  CREATE OR REPLACE TRIGGER triDelExama<br>
+  BEFORE DELETE ON exama<br>
+  FOR EACH ROW<br>
+  BEGIN<br>
+  DELETE FROM examb WHERE hak = :OLD.hak;<br>
+  END;</p>
+<p>DELETE FROM exama WHERE hak = '1111';<br>
+  COMMIT;<br>
+  SELECT * FROM exama;<br>
+  SELECT * FROM examb;<br>
+</p>
+<p>-- 행 트리거(AFTER) : 수정<a name="1616"></a><br>
+  CREATE OR REPLACE TRIGGER triUpdateExama<br>
+  AFTER UPDATE ON exama<br>
+  FOR EACH ROW<br>
+  DECLARE<br>
+  vtot NUMBER;<br>
+  vave NUMBER(5, 1);<br>
+  BEGIN<br>
+  vtot := :NEW.kor + :NEW.eng + :NEW.mat;<br>
+  vave := ROUND(vtot/3, 1);</p>
+<p> UPDATE examb SET tot=vtot, ave=vave<br>
+  WHERE hak = :NEW.hak; -- :OLD.hak<br>
+  END;<br>
+</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><strong><br>
+  16-2. 트리거 실습</strong><a name="1617"></a><br>
+  <br>
+  -- 상품 테이블 작성<a name="1618"></a><br>
+  CREATE TABLE 상품 (<br>
+상품코드 VARCHAR2(6) NOT NULL PRIMARY KEY<br>
+,상품명 VARCHAR2(30) NOT NULL<br>
+,제조사 VARCHAR2(30) NOT NULL<br>
+,소비자가격 NUMBER<br>
+,재고수량 NUMBER DEFAULT 0<br>
+);</p>
+<p>-- 입고 테이블 작성<a name="1619"></a><br>
+  CREATE TABLE 입고 (<br>
+  입고번호 NUMBER PRIMARY KEY<br>
+  ,상품코드 VARCHAR2(6) NOT NULL CONSTRAINT FK_ibgo_no<br>
+  REFERENCES 상품(상품코드)<br>
+  ,입고일자 DATE<br>
+  ,입고수량 NUMBER<br>
+  ,입고단가 NUMBER<br>
+  );</p>
+<p>-- 판매 테이블 작성<a name="1620"></a><br>
+  CREATE TABLE 판매 (<br>
+  판매번호 NUMBER PRIMARY KEY<br>
+  ,상품코드 VARCHAR2(6) NOT NULL CONSTRAINT FK_pan_no<br>
+  REFERENCES 상품(상품코드)<br>
+  ,판매일자 DATE<br>
+  ,판매수량 NUMBER<br>
+  ,판매단가 NUMBER<br>
+  );</p>
+<p>-- 상품 테이블에 자료 추가<a name="1621"></a><br>
+  INSERT INTO 상품(상품코드, 상품명, 제조사, 소비자가격) VALUES<br>
+  ('AAAAAA', '디카', '삼싱', 100000);<br>
+  INSERT INTO 상품(상품코드, 상품명, 제조사, 소비자가격) VALUES<br>
+  ('BBBBBB', '컴퓨터', '엘디', 1500000);<br>
+  INSERT INTO 상품(상품코드, 상품명, 제조사, 소비자가격) VALUES<br>
+  ('CCCCCC', '모니터', '삼싱', 600000);<br>
+  INSERT INTO 상품(상품코드, 상품명, 제조사, 소비자가격) VALUES<br>
+  ('DDDDDD', '핸드폰', '다우', 500000);<br>
+  INSERT INTO 상품(상품코드, 상품명, 제조사, 소비자가격) VALUES<br>
+  ('EEEEEE', '프린터', '삼싱', 200000);<br>
+  COMMIT;<br>
+  SELECT * FROM 상품;</p>
+<p>------------------------------------------------------------<br>
+  -- 3. 트리거 작성<a name="1622"></a><br>
+  -- 1) 입고 테이블에 INSERT 트리거를 작성 한다.<br>
+  -- [입고] 테이블에 자료가 추가 되는 경우 [상품] 테이블의 [재고수량]이 변경 되도록 트리거를 작성한다.</p>
+<p>CREATE OR REPLACE TRIGGER insTrg_Ipgo<br>
+  AFTER INSERT ON 입고<br>
+  FOR EACH ROW</p>
+<p>BEGIN<br>
+  UPDATE 상품 SET 재고수량 = 재고수량 + :NEW.입고수량 <br>
+  WHERE 상품코드 = :NEW.상품코드;<br>
+  END;<br>
+  /</p>
+<p>-- 입고 테이블에 데이터 입력<a name="1623"></a><br>
+  INSERT INTO 입고 (입고번호, 상품코드, 입고일자, 입고수량, 입고단가)<br>
+  VALUES (1, 'AAAAAA', '2004-10-10', 5, 50000);<br>
+  INSERT INTO 입고 (입고번호, 상품코드, 입고일자, 입고수량, 입고단가)<br>
+  VALUES (2, 'BBBBBB', '2004-10-10', 15, 700000);<br>
+  INSERT INTO 입고 (입고번호, 상품코드, 입고일자, 입고수량, 입고단가)<br>
+  VALUES (3, 'AAAAAA', '2004-10-11', 15, 52000);<br>
+  INSERT INTO 입고 (입고번호, 상품코드, 입고일자, 입고수량, 입고단가)<br>
+  VALUES (4, 'CCCCCC', '2004-10-14', 15, 250000);<br>
+  INSERT INTO 입고 (입고번호, 상품코드, 입고일자, 입고수량, 입고단가)<br>
+  VALUES (5, 'BBBBBB', '2004-10-16', 25, 700000);<br>
+  COMMIT;</p>
+<p>SELECT * FROM 상품;<br>
+  SELECT * FROM 입고;</p>
+<p> -- 2) 입고 테이블에 UPDATE 트리거를 작성 한다.<a name="1624"></a><br>
+  -- [입고] 테이블의 자료가 변경 되는 경우 [상품] 테이블의 [재고수량]이 변경 되도록 트리거를 작성한다.</p>
+<p>CREATE OR REPLACE TRIGGER upTrg_Ipgo<br>
+  AFTER UPDATE ON 입고<br>
+  FOR EACH ROW</p>
+<p>BEGIN<br>
+  UPDATE 상품 SET 재고수량 = 재고수량 - :OLD.입고수량 + :NEW.입고수량<br>
+  WHERE 상품코드 = :NEW.상품코드;<br>
+  END;<br>
+  /</p>
+<p>-- UPDATE 테스트<br>
+  UPDATE 입고 SET 입고수량 = 30 WHERE 입고번호 = 5;<br>
+  COMMIT;<br>
+  SELECT * FROM 상품;<br>
+  SELECT * FROM 입고;</p>
+<p> -- 3) 입고 테이블에 DELETE 트리거를 작성 한다.<a name="1625"></a><br>
+  -- [입고] 테이블의 자료가 삭제되는 경우 [상품] 테이블의 [재고수량]이 변경 되도록 트리거를 작성한다.</p>
+<p>CREATE OR REPLACE TRIGGER delTrg_Ipgo<br>
+  AFTER DELETE ON 입고<br>
+  FOR EACH ROW</p>
+<p>BEGIN<br>
+  UPDATE 상품 SET 재고수량 = 재고수량 - :OLD.입고수량<br>
+  WHERE 상품코드 = :OLD.상품코드;<br>
+  END;<br>
+  /</p>
+<p>-- DELETE 테스트<br>
+  DELETE FROM 입고 WHERE 입고번호 = 5;<br>
+  COMMIT;<br>
+  SELECT * FROM 상품;<br>
+  SELECT * FROM 입고;</p>
+<p> -- 입고 테이블의 재고 수량 수정 및 삭제는 상품 테이블의 재고 수량이 적거나 없으면 할 수 없으므로 UPDATE 및 DELETE 트리거를 BEFORE 트리거로 수정하야 상품 테이블의 재고 수량에 따라 수정 또는 삭제를 할수 없도록 수정한다.</p>
+<p> -- 4) 판매 테이블에 INSERT 트리거를 작성한다.(BEFORE 트리거로 작성)<a name="1626"></a><br>
+  -- [판매] 테이블에 자료가 추가 되는 경우 [상품] 테이블의 [재고수량]이 변경 되도록 트리거를 작성한다.</p>
+<p>CREATE OR REPLACE TRIGGER insTrg_Pan<br>
+  BEFORE INSERT ON 판매<br>
+  FOR EACH ROW</p>
+<p>DECLARE<br>
+  j_qty NUMBER;</p>
+<p>BEGIN</p>
+<p> SELECT 재고수량 INTO j_qty FROM 상품 WHERE 상품코드 = :NEW.상품코드;<br>
+  IF :NEW.판매수량 &gt; j_qty THEN<br>
+  raise_application_error(-20007, '판매 오류');<br>
+  ELSE<br>
+  UPDATE 상품 SET 재고수량 = 재고수량 - :NEW.판매수량 <br>
+  WHERE 상품코드 = :NEW.상품코드;<br>
+  END IF;<br>
+  END;<br>
+  /</p>
+<p>-- 판매 테이블에 데이터 입력<br>
+  INSERT INTO 판매 (판매번호, 상품코드, 판매일자, 판매수량, 판매단가) VALUES<br>
+  (1, 'AAAAAA', '2004-11-10', 5, 1000000);<br>
+  COMMIT;<br>
+  SELECT * FROM 상품;<br>
+  SELECT * FROM 판매;</p>
+<p>INSERT INTO 판매 (판매번호, 상품코드, 판매일자, 판매수량, 판매단가) VALUES<br>
+  (1, 'AAAAAA', '2004-11-10', 50, 1000000);<br>
+  COMMIT;<br>
+  SELECT * FROM 상품;<br>
+  SELECT * FROM 판매;<br>
+</p>
+<p> -- 5) 판매 테이블에 UPDATE 트리거를 작성한다.(BEFORE 트리거로 작성)<a name="1627"></a><br>
+  -- [판매] 테이블의 자료가 변경 되는 경우 [상품] 테이블의 [재고수량]이 변경 되도록 트리거를 작성한다.</p>
+<p>CREATE OR REPLACE TRIGGER upTrg_Pan<br>
+  BEFORE UPDATE ON 판매<br>
+  FOR EACH ROW</p>
+<p>DECLARE<br>
+  j_qty NUMBER;</p>
+<p>BEGIN</p>
+<p> SELECT 재고수량 INTO j_qty FROM 상품 WHERE 상품코드 = :NEW.상품코드;<br>
+  IF :NEW.판매수량 &gt; (j_qty + :OLD.판매수량) THEN<br>
+  raise_application_error(-20007, '판매량이 재고량보다 많을 수 없습니다.');<br>
+  ELSE<br>
+  UPDATE 상품 SET 재고수량 = 재고수량 + :OLD.판매수량 - :NEW.판매수량 <br>
+  WHERE 상품코드 = :NEW.상품코드;<br>
+  END IF;<br>
+  END;<br>
+  /</p>
+<p>-- UPDATE 테스트<br>
+  UPDATE 판매 SET 판매수량 = 200 WHERE 판매번호 = 1;<br>
+  UPDATE 판매 SET 판매수량 = 10 WHERE 판매번호 = 1;<br>
+  COMMIT;<br>
+  SELECT * FROM 상품;<br>
+  SELECT * FROM 판매;<br>
+</p>
+<p> -- 6) 판매 테이블에 DELETE 트리거를 작성 한다.<a name="1628"></a><br>
+  -- [판매] 테이블에 자료가 삭제되는 경우 [상품] 테이블의 [재고수량]이 변경 되도록 트리거를 작성한다.</p>
+<p>CREATE OR REPLACE TRIGGER delTrg_Pan<br>
+  AFTER DELETE ON 판매<br>
+  FOR EACH ROW</p>
+<p>BEGIN<br>
+  UPDATE 상품 SET 재고수량 = 재고수량 + :OLD.판매수량<br>
+  WHERE 상품코드 = :OLD.상품코드;<br>
+  END;<br>
+  /</p>
+<p>-- DELETE 테스트<br>
+  DELETE 판매 WHERE 판매번호 = 1;<br>
+  COMMIT;<br>
+  SELECT * FROM 상품;<br>
+  SELECT * FROM 판매;</p>
+<p>-- 다음과 같은 방법을 이용하여 관련된 트리거는 하나의 트리거로 작성 할 수 있다.<br>
+  -- IF INSERTING THEN <br>
+  -- 추가할 때 <br>
+  -- ELSIF UPDATING THEN<br>
+  -- 수정할 때 <br>
+  -- ELSIF DELETING THEN<br>
+  -- 삭제할 때 <br>
+  -- END IF;</p>
+<p></p>
+<p></p>
+<p><strong>17. 예외처리</strong><br>
+  <br>
+   <br>
+  예외처리<a name="171"></a><br>
+-- PL/SQL 을 실행 하는 동안에 발생하는 에러 처리</p>
+<p> -- 예외 트랩(trap)<a name="172"></a><br>
+  만일 예외가 블록의 실행 가능한 섹션에서 발생한다면, 처리는 블록의 예외 섹션에서 해당 예외 처리기로 제어가 넘어 간다. PL/SQL 블록이 성공적으로 예외를 처리 한다면 이때 예외는 둘러싸는 블록이나 환경으로 전달 되지 않는다.</p>
+<p> -- 예외 전달<a name="173"></a><br>
+  예외를 처리하는 다른 방법은 실행 환경으로 예외를 전달하도록 하는 것이다. 예외가 블록의 실행부에서 발생하여 해당 예외 처리기가 없다면, PL/SQL 블록의 나머지 부분은 수행되지 못하고 종료된다. </p>
+<p> -- 예외 검출<a name="174"></a><br>
+  예외가 블록의 실행부에서 발생하면 블록의 예외부에 있는 해당 예외 처리부로 제어가 넘어간다.</p>
+<p> -- 예외의 유형<a name="175"></a><br>
+  실행 중에 ERROR가 발생하면 프로그램이 중단되지 않고 예외에 대한 프로그램을 할 수 있다.</p>
+<p> 정의된 ORACLE SERVER ERROR : PL/SQL코드에서 자주 발생하는 ERROR을 미리 정의함(선언할 수 없고 ORACLE SERVER이 암시적으로 발생)<br>
+  정의되지 않은 ORACLE SERVER ERROR : 기타 표준 ORACLE SERVER ERROR(사용자가 선언하고 ORACLE SERVER이 그것을 암시적으로 발생)<br>
+  사용자 정의 ERROR : 프로그래머가 정한 조건이 만족되지 않을 경우 발생(사용자가 선언하고 명시적으로 발생한다.)</p>
+<p> -- 예외정의<a name="176"></a><br>
+  EXCEPTION<br>
+  WHEN exception1 [OR exception2, . . . .] THEN<br>
+  statement1;<br>
+  statement2;<br>
+  . . . . . .<br>
+  [WHEN exception2 [OR exception3, . . . .] THEN<br>
+  statement3;<br>
+  statement4;<br>
+  . . . . . .]<br>
+  [WHEN OTHERS THEN<br>
+  statement5;<br>
+  statement6;<br>
+  . . . . . .]<br>
+  END;</p>
+<p> OTHERS : 명시적으로 선언되지 않은 모든 예외를 트랩하는 예외 처리 절<br>
+</p>
+<p>-- 정의된 오라클 서버 에러<a name="177"></a><br>
+  NO_DATA_FOUND(ORA-01403) : 데이터를 RETURN하지 않는 SELECT문장<br>
+  TOO_MANY_ROWS(ORA-01422) : 단일 행 SELECT는 하나 이상의 행을 RETURN</p>
+<p>------------------------------------------------------------<br>
+  DECLARE<br>
+  TYPE insa_rec IS RECORD (<br>
+  v_num insa.num%TYPE<br>
+  ,v_name insa.name%TYPE<br>
+  ,v_basicpay insa.basicpay%TYPE<br>
+  );<br>
+  rec insa_rec;<br>
+  <br>
+  BEGIN<br>
+  SELECT num, name, basicpay INTO rec <br>
+  FROM INSA WHERE num=1001;<br>
+  <br>
+  IF rec.v_name = '홍길동' THEN<br>
+  UPDATE INSA SET name='김길동' <br>
+  WHERE num=rec.v_num;<br>
+  END IF;<br>
+  EXCEPTION<br>
+  WHEN NO_DATA_FOUND THEN<br>
+  DBMS_OUTPUT.PUT_LINE('데이터가 없습니다.');<br>
+  WHEN TOO_MANY_ROWS THEN<br>
+  -- 단일행 SELECT문은 하나의 행만 리턴해야 한다.<br>
+  DBMS_OUTPUT.PUT_LINE('데이터가 여러개입니다.'); <br>
+  WHEN OTHERS THEN<br>
+  DBMS_OUTPUT.PUT_LINE('기타 에러입니다.');<br>
+  END;</p>
+<p>SELECT * FROM INSA;<br>
+  ROLLBACK;</p>
+<p>SELECT * FROM INSA;<br>
+  <br>
+  <br>
+  -- 사용자 정의 예외<a name="178"></a><br>
+  -- 선언 절차<br>
+  1. 선언 섹션에서 사용자가 선언한다.<br>
+exception_name EXCEPTION;</p>
+<p> exception_name : 예외 이름을 정의</p>
+<p> 2. 실행 섹션에서 명시적으로 예외를 발생하기 위해 RAISE문장을 사용한다.<br>
+  RAISE exception_name;</p>
+<p> exception_name : 앞에서 선언된 예외 이름을 기술한다.</p>
+<p> 3. 해당 예외 처리기 안에 선언된 예외를 참조한다.</p>
+<p>------------------------------------------------------------<br>
+  DECLARE<br>
+  TYPE insa_rec IS RECORD (<br>
+  v_num insa.num%TYPE<br>
+  ,v_name insa.name%TYPE<br>
+  ,v_basicpay insa.basicpay%TYPE<br>
+  );<br>
+  rec insa_rec;<br>
+  <br>
+  insa_basicpay_check EXCEPTION;<br>
+  <br>
+  BEGIN<br>
+  SELECT num, name, basicpay INTO rec <br>
+  FROM INSA WHERE num=1001;<br>
+  IF rec.v_basicpay &gt; 2500000 THEN<br>
+  RAISE insa_basicpay_check;<br>
+  ELSE<br>
+  DBMS_OUTPUT.PUT_LINE(rec.v_name || ' ' || rec.v_basicpay);<br>
+  END IF;<br>
+  EXCEPTION<br>
+  WHEN insa_basicpay_check THEN<br>
+  DBMS_OUTPUT.PUT_LINE('기본급이 250만원 이상입니다.');<br>
+  WHEN OTHERS THEN<br>
+  DBMS_OUTPUT.PUT_LINE('기타 에러입니다.');<br>
+  END;<br>
+</p>
+<p><br>
+  <br>
+  -- 예외 트래핑 함수<a name="179"></a><br>
+에러가 발생 했을 때 두 함수를 사용하여 관련된 에러 코드 또는 메시지를 확인할 수 있다. <br>
+코드 또는 메시지에 따라 에러에 대해 취할 작업을 정할 수 있다.</p>
+<p> -- SQLCODE : 에러코드<br>
+  -- SQLERRM : 에러 메시지</p>
+<p><br>
+  DECLARE<br>
+  TYPE insa_rec IS RECORD (<br>
+  v_num insa.num%TYPE<br>
+  ,v_name insa.name%TYPE<br>
+  ,v_basicpay insa.basicpay%TYPE<br>
+  );<br>
+  rec insa_rec;<br>
+  <br>
+  BEGIN<br>
+  SELECT num, name, basicpay INTO rec <br>
+  FROM INSA WHERE num=8001;<br>
+  <br>
+  IF rec.v_name = '홍길동' THEN<br>
+  UPDATE INSA SET name='김길동' WHERE num=rec.v_num;<br>
+  END IF;<br>
+  EXCEPTION<br>
+  WHEN OTHERS THEN<br>
+  DBMS_OUTPUT.PUT_LINE('에러 코드 : ' || SQLCODE);<br>
+  DBMS_OUTPUT.PUT_LINE('에러 메시지 : ' || SQLERRM);<br>
+  END;<br>
+  <br>
+  <br>
+  -- raise_application_error<a name="1710"></a><br>
+  -- 표준화되지 않은 에러 코드와 에러 메시지를 리턴하기 위해 raise_application_error 프로시저 사용<br>
+-- 코드값은 -20000~-20999사이의 수 사용</p>
+<p>------------------------------------------------------------<br>
+  DECLARE<br>
+  v_num insa.num%TYPE;<br>
+  BEGIN<br>
+  v_num := 8001;<br>
+  DELETE FROM insa WHERE num=v_num;<br>
+  <br>
+  IF SQL%NOTFOUND THEN<br>
+  raise_application_error(-20100, '자료가 없음');<br>
+  END IF;<br>
+  END;<br>
+</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><strong>18. 패키지<br>
+  </strong> 
+  <br>
+  <br>
+  -- 패키지<a name="181"></a><br>
+-- 타입, 프로그램객체, 프로시져, 함수등을 논리적으로 묶어 놓은것</p>
+<p>-- 작성 방법<a name="182"></a><br>
+  1. 패키지 명세<br>
+  2. 패키지 몸체 구현</p>
+<p> -----------------------------------------------------<br>
+  -- 작성<br>
+  -- 1. 패키지 명세<a name="183"></a><br>
+  CREATE OR REPLACE PACKAGE pack_insa IS<br>
+  FUNCTION fn_sex(ssn IN VARCHAR2) <br>
+  RETURN VARCHAR2;<br>
+  PROCEDURE list_insa(pNum IN NUMBER);<br>
+  END pack_insa;</p>
+<p> -- 2. 패키지 몸체 구현<a name="184"></a><br>
+  CREATE OR REPLACE PACKAGE BODY pack_insa IS<br>
+  FUNCTION fn_sex(ssn IN VARCHAR2) <br>
+  RETURN VARCHAR2<br>
+  IS<br>
+  varSex VARCHAR2(10) := '여자';<br>
+  BEGIN<br>
+  IF SUBSTR(ssn, 8, 1) IN ('1', '3') THEN<br>
+  varSex := '남자'; <br>
+  END IF;<br>
+  RETURN varSex;<br>
+  END;</p>
+<p> PROCEDURE list_insa(pNum IN NUMBER)<br>
+  IS<br>
+  varName VARCHAR2(20);<br>
+  varSsn VARCHAR2(20);<br>
+  VarSex VARCHAR2(10);<br>
+  BEGIN<br>
+  SELECT name, ssn, fn_sex(ssn) sex INTO varName, varSsn, varSex FROM insa WHERE num=pNum;<br>
+  DBMS_OUTPUT.PUT_LINE(varName || ' ' || varSsn || ' ' || varSex);<br>
+  END;<br>
+  END pack_insa;</p>
+<p>EXEC pack_insa.list_insa(1001);</p>
+<p>-- 오버로딩<a name="185"></a><br>
+  CREATE OR REPLACE PACKAGE pack_insa IS<br>
+  FUNCTION fn_sex(ssn IN VARCHAR2) <br>
+  RETURN VARCHAR2;<br>
+  PROCEDURE list_insa(pNum IN NUMBER);<br>
+  PROCEDURE list_insa(pName IN VARCHAR2);<br>
+  END pack_insa;</p>
+<p>CREATE OR REPLACE PACKAGE BODY pack_insa IS<br>
+  FUNCTION fn_sex(ssn IN VARCHAR2) <br>
+  RETURN VARCHAR2<br>
+  IS<br>
+  varSex VARCHAR2(10) := '여자';<br>
+  BEGIN<br>
+  IF SUBSTR(ssn, 8, 1) IN ('1', '3') THEN<br>
+  varSex := '남자'; <br>
+  END IF;<br>
+  RETURN varSex;<br>
+  END;</p>
+<p> PROCEDURE list_insa(pNum IN NUMBER)<br>
+  IS<br>
+  varName VARCHAR2(20);<br>
+  varSsn VARCHAR2(20);<br>
+  VarSex VARCHAR2(10);<br>
+  BEGIN<br>
+  SELECT name, ssn, fn_sex(ssn) sex INTO varName, varSsn, varSex FROM insa WHERE num=pNum;<br>
+  DBMS_OUTPUT.PUT_LINE(varName || ' ' || varSsn || ' ' || varSex);<br>
+  END;</p>
+<p> PROCEDURE list_insa(pName IN VARCHAR2)<br>
+  IS<br>
+  CURSOR cur_insa IS<br>
+  SELECT name, ssn, fn_sex(ssn) sex FROM insa WHERE name LIKE '%' || pName || '%';<br>
+  BEGIN<br>
+  FOR rec IN cur_insa LOOP<br>
+  DBMS_OUTPUT.PUT_LINE(rec.Name || ' ' || rec.Ssn || ' ' || rec.Sex);<br>
+  END LOOP;<br>
+  END;<br>
+  END pack_insa;</p>
+<p>EXEC pack_insa.list_insa(1001);<br>
+  EXEC pack_insa.list_insa('김');</p>
+<p></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><strong>19. 테이블 스페이스<br>
+</strong>  <br>
+<br>
+  -- 테이블 스페이스<a name="191"></a><br>
+-- 시스템 테이블 스페이스 종류<a name="192"></a><br>
+-- SYSTEM : 오라클 서버가 사용하는 공간으로 자료사전 테이블, 뷰가 저장<br>
+-- UNDOTBS1 : 트랜잭션의 ROLLBACK문을 실행할 때 변경이전의 데이터로 복구하기 위한 데이터 저장 공간<br>
+-- SYSAUX : 기본적으로 만들어지는 시스템 관리용 테이블스페이스<br>
+-- TEMP : GROUP BY, ORDER BY, HAVING, START WITH와 같은 SQL 문에서 SORT 작업이 발생되는데, 이 때 사용되는 데이터베이스 내부의 임시 저장 공간<br>
+-- USERS : 사용자가 테스트 할 수 있는 기본적으로 만들어지는 공간</p>
+<p>-- 참고<a name="193"></a><br>
+  -- 1 block : 8KB<br>
+  -- 8 block = 1 extent = 64 kb<br>
+  -- 테이블 생성시 1 extent 생성<br>
+  -- extent(table)이 모여서 segment<br>
+  -- segment가 저장되는 공간 : 테이블 스페이스<br>
+  -- 여러개의 테이블스페이스가 모여 데이터베이스<br>
+</p>
+<p>  -- SYS 계정<a name="194"></a><br>
+  -- dba_tablespaces 데이터 사전<a name="195"></a><br>
+  SELECT tablespace_name, initial_extent, min_extlen<br>
+  FROM dba_tablespaces;</p>
+<p>-- dba_data_files 데이터 사전<br>
+  SELECT file_name, tablespace_name FROM dba_data_files;</p>
+<p>-- 테이블 스페이스 공간 확인<a name="196"></a><br>
+  SELECT tablespace_name, SUM(bytes), MAX(bytes) FROM<br>
+  DBA_FREE_SPACE<br>
+  GROUP BY tablespace_name;<br>
+</p>
+<p>  -- 테이블 스페이스 생성(크기 : 100M)<a name="197"></a><br>
+  CREATE TABLESPACE sp_exam DATAFILE 'd:/tbl/exam_data.dbf'<br>
+  SIZE 100M; <br>
+  -- 용량은 짝수로 지정할것을 권장(디스크상에서 짝수로 용량이 늘어나므로 디스크용량낭비 방지)</p>
+<p>SELECT * FROM v$tablespace;<br>
+  SELECT tablespace_name FROM dba_tablespaces;</p>
+<p>-- 사용자 계정<br>
+  sp_exam 테이블 스페이스에 테이블 작성<br>
+  CREATE TABLE sp1 (id NUMBER) TABLESPACE sp_exam;</p>
+<p>-- 자신에게 부여된 테이블스페이스의 용량 확인<a name="198"></a><br>
+  SELECT * FROM USER_TS_QUOTAS;</p>
+<p> -- MAX_BYTES : -1 -&gt; 무한대<br>
+</p>
+<p><br>
+  -- 테이블 스페이스 용량 변경<a name="199"></a><br>
+  -- SYS 계정<br>
+  ALTER DATABASE DATAFILE 'd:/tbl/exam_data.dbf'<br>
+  RESIZE 300M;<br>
+</p>
+<p><br>
+  -- 테이블 스페이스 삭제<a name="1910"></a><br>
+  DROP TABLESPACE sp_exam INCLUDING CONTENTS;<br>
+  -- INCLUDING CONTENTS : <br>
+  -- 테이블스페이스에 테이블등 객체가 존재해도 삭제</p>
+<p>SELECT tablespace_name, contents FROM dba_tablespaces;</p>
+<p>-- 실제 파일을 탐색기로 제거해야 함<br>
+</p>
+<p><br>
+  -- 테이블 스페이스 자동 확장<a name="1911"></a><br>
+  CREATE TABLESPACE sp_exam<br>
+  DATAFILE 'd:/tbl/db_data.dbf' SIZE 20M<br>
+  AUTOEXTEND ON NEXT 10M MAXSIZE 1000M<br>
+  EXTENT MANAGEMENT LOCAL UNIFORM SIZE 1M;<br>
+  -- AUTOEXTEND ON : 자동확장</p>
+<p>SELECT * FROM v$tablespace;</p>
+<p> -- AUTOEXTEND ON NEXT 10M MAXSIZE 1000M<br>
+  -- 20M 을 다 사용하면 10M씩 자동 증가(1000M 까지)<br>
+  -- EXTENT MANAGEMENT LOCAL UNIFORM SIZE 1M<br>
+  -- 테이블스페이스의 각 extent size를 1M으로 지정<br>
+  -- EXTENT : 일정한 수의 ORACLE 블럭(기본 1M)</p>
+<p>-- 삭제<br>
+  DROP TABLESPACE sp_exam INCLUDING CONTENTS;<br>
+</p>
+<p><br>
+  -- 테이블 스페이스 자동 확장(용량을 지정하지 않으면 무한대)<br>
+  -- (초기크기 : 20M)<br>
+  CREATE TABLESPACE sp_exam<br>
+  DATAFILE 'd:/tbl/db_data.dbf'<br>
+  SIZE 20M AUTOEXTEND ON;<br>
+  <br>
+  -- 삭제<br>
+  DROP TABLESPACE sp_exam INCLUDING CONTENTS;<br>
+</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><strong>20. 사용자 관리<a name="201"></a><br>
+</strong>  <br>
+</p>
+<p>  -- 주요 자료사전(data dictionary)<a name="202"></a></p>
+<p><br>
+-- SYS 계정</p>
+<p>-- 사용자 목록 확인<a name="203"></a><br>
+  SELECT username, password, created FROM DBA_USERS;<br>
+  SELECT username, password, created FROM DBA_USERS WHERE username='사용자명';</p>
+<p>SELECT * FROM all_users; -- 전체 사용자 확인<br>
+</p>
+<p>-- 시스템 권한(CREATE TABLE, CREATE VIEW 등)<a name="204"></a><br>
+  SELECT * FROM DBA_SYS_PRIVS; -- 부여된 모든 시스템 권한 조회<br>
+  SELECT * FROM SYSTEM_PRIVILEGE_MAP; -- 전체 시스템 권한 목록<br>
+</p>
+<p>-- 롤 확인<a name="205"></a><br>
+  SELECT * FROM DBA_ROLES;</p>
+<p>-- 롤에 부여된 시스템 권한(CREATE TABLE, CREATE VIEW 등) 확인<a name="206"></a><br>
+  SELECT * FROM role_sys_privs;<br>
+  SELECT * FROM role_sys_privs WHERE role='CONNECT';<br>
+  SELECT * FROM role_sys_privs WHERE role='RESOURCE';<br>
+</p>
+<p>-- 롤에 존재하는 롤 확인<a name="207"></a><br>
+  SELECT * FROM role_role_privs;<br>
+</p>
+<p>-- 롤이 가지고 있는 객체 권한(INSERT, SELECT 등) 확인<a name="208"></a><br>
+  SELECT * FROM ROLE_TAB_PRIVS<br>
+</p>
+<p>-- 테이블스페이스 할당량을 확인<a name="209" id="209"></a><br>
+  SELECT username, tablespace_name, bytes/1024, max_bytes/1024 FROM dba_ts_quotas;<br>
+  <br>
+  <br>
+-- 사용자 계정</p>
+<p>-- 사용자의 시스템 권한(CREATE TABLE, CREATE VIEW 등) 확인<a name="2010"></a><br>
+  SELECT * FROM USER_SYS_PRIVS;<br>
+</p>
+<p>-- 사용자에게 부여된 롤 확인<a name="2011"></a><br>
+  SELECT * FROM user_role_privs;<br>
+</p>
+<p>-- 가지고 있는 객체 권한 확인(INSERT, UPDATE, SELECT, DELETE 등)<a name="2012"></a><br>
+  SELECT * FROM USER_TAB_PRIVS;<br>
+</p>
+<p>-- 다른 사용자로 부터 받은 객체 권한 확인(INSERT, UPDATE, SELECT, DELETE 등)<a name="2013"></a><br>
+  SELECT * FROM USER_TAB_PRIVS_RECD;<br>
+</p>
+<p>-- 테이블 목록 확인<br>
+  SELECT * FROM tab;<br>
+  <br>
+</p>
+<p>-- 테이블 컬럼 확인<a name="2014"></a><br>
+  SELECT * FROM USER_tab_columns WHERE table_name='테이블명';<br>
+  SELECT * FROM ALL_TAB_COLUMNS WHERE owner ='디비계정' and table_name = '테이블명' <br>
+</p>
+<p>-- 제약조건 확인<a name="2015"></a><br>
+  DESC user_constraints; -- user_constraints 구조 확인</p>
+<p> SELECT * FROM USER_constraints WHERE table_name='INSA'; <br>
+  -- 어떤 컬럼에 제약조건이 부여되었는지 확인 불가 P : 기본키, C : NOT NULL 등, U : UNIQUE, R : 참조키 등</p>
+<p> SELECT constraint_name, table_name, constraint_type FROM user_constraints;</p>
+<p>-- 현재 user가 가지고 있는 column에 할당된 제약조건에 대한 정보<a name="2016"></a><br>
+  SELECT * FROM USER_cons_columns; -- 어떤 컬럼에 기본키가 부여되었는지 확인 가능<br>
+</p>
+<p>-- procedure, function 목록 확인<a name="2017"></a><br>
+  SELECT object_name FROM user_procedures;<br>
+</p>
+<p>-- 테이블의 프로시저, 함수, 패키지 등 상호 참조되는 관계 확인<a name="2018"></a><br>
+  SELECT * FROM user_dependencies;<br>
+</p>
+<p> -- 트리거 확인<a name="2019"></a><br>
+  SELECT trigger_name, trigger_type, table_name FROM user_triggers;<br>
+</p>
+<p>-- 프로시저, 함수등의 소스 확인<a name="2020"></a><br>
+  SELECT TEXT FROM user_source;<br>
+</p>
+<p>-- 뷰 목록, 소스 확인<a name="2021"></a><br>
+  SELECT view_name, text FROM user_views;<br>
+</p>
+<p>-- 시퀀스 목록 확인<a name="2022"></a><br>
+  SELECT * FROM seq;<br>
+  SELECT * FROM user_sequences;<br>
+</p>
+<p><br>
+  <br>
+  -- 사용자 확인, 락 설정, 해제<a name="2023"></a><br>
+  -- SYS 계정<br>
+  SQLPLUS sys/&quot;암호&quot; as sysdba<br>
+SELECT * FROM all_users; -- 전체 사용자 확인</p>
+<p>-- soctt LOCK 설정<br>
+  ALTER USER scott ACCOUNT LOCK;</p>
+<p>-- SCOTT 계정<br>
+  CONN scott/&quot;암호&quot;<br>
+  -- 에러 : Lock이 설정되어 오라클 접속을 할수 없다.</p>
+<p>-- SYS 계정<br>
+  SQL&gt;CONN sys/&quot;암호&quot; as sysdba</p>
+<p>-- soctt LOCK 해제<br>
+  SQL&gt;ALTER USER scott ACCOUNT UNLOCK;<br>
+  <br>
+  <br>
+  -- 사용자 관리 - 사용자 추가<a name="2025"></a><br>
+  -- SYS 계정<br>
+  CREATE USER sky IDENTIFIED BY abc;<br>
+-- 로그온 권한이 없어서 CONN가 불가능</p>
+<p>-- sky 사용자에게 데이터베이스에 접속할 수 있는 권한 부여<br>
+  GRANT CREATE SESSION TO sky;</p>
+<p><br>
+  -- sky 계정<br>
+  -- 테이블 작성<br>
+  CREATE TABLE TEST(id NUMBER);<br>
+  -- 테이블 스페이스 사용 권한이 없으므로 테이블을 작성할 수 없다.<br>
+</p>
+<p>--사용자 삭제<br>
+  -- SYS 계정<br>
+  -- sky 사용자가 CONN 되어 있는 상태에서는 삭제 불가<br>
+  DROP USER sky; -- 테이블등이 존재하면 오류<br>
+  -- DROP USER sky CASCADE; -- 테이블등이 존재하면 객체도 같이 삭제<br>
+</p>
+<p><br>
+  -- 테이블스페이스를 사용할수 있는 권한을 부여하여 sky 사용자 추가<a name="2026"></a><br>
+  -- SYS 계정<br>
+  CREATE USER sky IDENTIFIED BY abc<br>
+  DEFAULT TABLESPACE USERS<br>
+  QUOTA UNLIMITED ON USERS; -- 무한대<br>
+-- QUOTA 50M ON USERS;</p>
+<p>GRANT CREATE SESSION TO sky; -- DB 접속 권한</p>
+<p>-- 테이블 스페이스의 권한을 부여 했지만 테이블을 만들수 있는 권한이 없으므로 테이블 생성 불가<br>
+</p>
+<p><br>
+  -- SYS 계정<br>
+  -- 롤 권한 확인<br>
+  SELECT * FROM role_sys_privs WHERE role='CONNECT';<br>
+SELECT * FROM role_sys_privs WHERE role='RESOURCE';</p>
+<p>-- 테이블 생성 권한 부여<br>
+  GRANT CREATE TABLE TO sky;<br>
+  -- RESOURCE : 롤 -&gt; 테이블스페이스, 테이블 생성, 자료형 생성등 몇가지 권한을 모아모은것<br>
+  -- GRANT RESOURCE TO sky;</p>
+<p>-- 사용자에 CONN, 테이블스페이스, 테이블작성등의 권한을 한번에 부여<br>
+  -- GRANT CONNECT, RESOURCE TO sky;</p>
+<p>DROP USER sky; -- 테이블이 존재하면 삭제 불가능<br>
+  -- DROP USER sky CASCADE; -- 테이블 등의 개체가 존재해도 삭제</p>
+<p><br>
+  -- SYS 계정<br>
+CREATE USER sky IDENTIFIED BY abc;</p>
+<p>-- 사용자에게 테이블 스페이스 권한 부여<br>
+  ALTER USER sky<br>
+  DEFAULT TABLESPACE USERS<br>
+  QUOTA 50M ON USERS;</p>
+<p>-- 테이블스페이스 할당량을 확인<br>
+  SELECT * FROM dba_ts_quotas;<br>
+  SELECT username, tablespace_name, bytes/1024,<br>
+  max_bytes/1024 FROM dba_ts_quotas;<br>
+</p>
+<p><br>
+  -- SYS 계정<a name="2027"></a><br>
+  -- 암호 관리<br>
+GRANT CREATE SESSION TO sky; -- DB 접속 권한</p>
+<p>-- SYS에 의해 암호 변경<a name="2028"></a><br>
+  ALTER USER sky IDENTIFIED BY king;</p>
+<p>-- sky 계정<a name="2029"></a><br>
+  -- sky 자신이 암호변경<br>
+  ALTER USER sky IDENTIFIED BY king1;</p>
+<p>-- SYS 계정<a name="2030"></a><br>
+  -- sky 사용자의 암호를 만료 시킴<br>
+  ALTER USER sky PASSWORD EXPIRE;<br>
+  -- sky 사용자로 CONN시 오류출력후 새로운 암호 입력 요구</p>
+<p>DROP USER sky;<br>
+</p>
+<p><br>
+  -- SYS 암호 변경<br>
+  CMD&gt;sqlplus &quot;/AS sysdba&quot;<br>
+  -- CMD&gt;sqlplus /nolog<br>
+  SQL&gt;ALTER USER sys IDENTIFIED BY 암호;<br>
+  SQL&gt;CONN sys/암호<br>
+</p>
+<p><br>
+  <br>
+  -- 시스템 권한 : DB 작업, 연산을 수행하기 위해 필요한 권한<a name="2031"></a><br>
+  -- CREATE TABLE, CREATE USER, CREATE SESSION.....</p>
+<p><br>
+  -- SYS 계정<br>
+  SELECT * FROM DBA_SYS_PRIVS; -- 부여된 모든 시스템 권한 조회<br>
+  SELECT * FROM SYSTEM_PRIVILEGE_MAP; -- 전체 시스템 권한 목록</p>
+<p><br>
+  <br>
+  -- 사용자가 시스템 권한 확인<a name="2032"></a><br>
+  -- 사용자 계정<br>
+  SELECT * FROM USER_SYS_PRIVS;</p>
+<p><br>
+  -- SYS 계정<br>
+  CREATE USER sky1 IDENTIFIED BY king1;<br>
+  CREATE USER sky2 IDENTIFIED BY king2;</p>
+<p><br>
+  -- DB 접근 권한 부여<a name="2033"></a><br>
+  GRANT CREATE SESSION TO sky1; <br>
+GRANT CREATE SESSION TO sky2;</p>
+<p>-- sky1 계정<br>
+  -- 부여된 시스템 권한 확인<br>
+  SELECT * FROM USER_SYS_PRIVS;</p>
+<p>-- SYS 계정<br>
+  GRANT CREATE TABLE, CREATE VIEW TO sky1;<br>
+  GRANT RESOURCE TO sky2;</p>
+<p>-- sky1 계정<br>
+  CREATE TABLE TEST(id NUMBER); -- 오류 : 테이블 스페이스 권한이 없어서</p>
+<p>-- sky2<br>
+  -- 사용자에게 부여된 롤 확인<br>
+  SELECT * FROM user_role_privs;</p>
+<p>CREATE TABLE TEST(id NUMBER);<br>
+  -- RESOURCE 롤은 CREATE TABLE, 테이블스페이스등의 권한이 존재하므로</p>
+<p>-- sky1 계정<br>
+  GRANT CREATE VIEW TO sky2; -- ADMIN 권한을 가지고 있지 않으므로 다른 사용자에게 권한을 부여 하지 못함</p>
+<p>-- SYS 계정<br>
+  GRANT CREATE TABLE, CREATE VIEW TO sky1<br>
+  WITH ADMIN OPTION; -- ADMIN 권한 부여</p>
+<p>-- sky1 계정<br>
+  GRANT CREATE VIEW TO sky2;<br>
+</p>
+<p><br>
+  -- 권한 회수<a name="2034"></a><br>
+  -- SYS 계정<br>
+  REVOKE CREATE TABLE, CREATE VIEW FROM sky1;</p>
+<p>-- 사용자 제거<a name="2035"></a><br>
+  DROP USER sky1;<br>
+  DROP USER sky2 CASCADE; -- 테이블등이 존재하면 오류가 발생하는데 CASCADE 옵션을 붙이면 테이블도 자동 삭제<br>
+</p>
+<p><br>
+  -- 객체 권한(INSERT, UPDATE....... 등) 확인<a name="2036"></a></p>
+<p>-- 사용자 계정<a name="2037"></a><br>
+  -- 가지고 있는 객체 권한 확인<br>
+  SELECT * FROM USER_TAB_PRIVS;</p>
+<p> -- 다른 사용자로 부터 받은 객체 권한 확인<a name="2038"></a><br>
+  SELECT * FROM USER_TAB_PRIVS_RECD;</p>
+<p>-- SYS 계정<br>
+  -- 모든 테이블 관련 권한 확인<br>
+  SELECT * FROM DBA_TAB_PRIVS;</p>
+<p><br>
+  -- SYS : 객체 권한<br>
+  CREATE USER sky1 IDENTIFIED BY king1;<br>
+  CREATE USER sky2 IDENTIFIED BY king2;</p>
+<p>GRANT CONNECT, RESOURCE, CREATE VIEW TO sky1;<br>
+  GRANT CONNECT, RESOURCE TO sky2;<br>
+  -- CONNECT, RESOURCE : 롤</p>
+<p>-- sky1<br>
+  CREATE TABLE TEST(id NUMBER, name VARCHAR2(20));<br>
+  INSERT INTO TEST (id, name) VALUES(1, 'aaa');<br>
+  INSERT INTO TEST (id, name) VALUES(2, 'bbb');<br>
+  COMMIT;</p>
+<p>GRANT SELECT ON test TO sky2;<br>
+  -- sky1이 sky2한테 test 테이블의 SELECT 권한 부여</p>
+<p>-- sky2<br>
+  SELECT * FROM sky1.test;</p>
+<p>SELECT * FROM USER_TAB_PRIVS; -- 가지고 있는 객체 권한<br>
+  SELECT * FROM USER_TAB_PRIVS_RECD; -- 받은 객체 권한 확인</p>
+<p>INSERT INTO sky1.test (id, name) VALUES (3, 'ccc');<br>
+  -- 오류 : INSERT 권한이 없으므로</p>
+<p>-- sky1 계정<br>
+  -- sky2 에게 sky1 테이블에 INSERT 권한 부여<br>
+  GRANT INSERT(id, name) ON test TO sky2;<br>
+  -- 또는 GRANT INSERT ON test TO sky2;</p>
+<p>-- sky2 계정<br>
+  INSERT INTO sky1.test (id, name) VALUES (3, 'ccc');<br>
+  COMMIT;<br>
+  SELECT * FROM sky1.test;</p>
+<p>-- 권한 회수<br>
+  -- sky1<br>
+  REVOKE SELECT ON test FROM sky2;</p>
+<p>-- sky2 계정<br>
+  SELECT * FROM sky1.test;<br>
+  -- 오류</p>
+<p>-------------------------------------------<br>
+  --SYS 계정<br>
+  DROP USER sky1 CASCADE;<br>
+  DROP USER sky2 CASCADE;<br>
+</p>
+<p>  --ROLE : 관리의 효율성을 위해 서로 연관된 권한을 한데 묶은 그룹<a name="2039"></a></p>
+<p>------------------------------------------------------<br>
+  -- SYS 계정<br>
+  -- ROLE 확인<br>
+  SELECT * FROM DBA_ROLES;</p>
+<p>------------------------------------------------------<br>
+  -- ROLE 생성과정<a name="2040"></a><br>
+  -- 롤생성 -&gt; 롤에 권한 부여 -&gt; 롤을 사용자에 부여</p>
+<p>------------------------------------------------------<br>
+  -- Role 생성<a name="2041"></a><br>
+  CREATE ROLE std_role;<br>
+  SELECT * FROM DBA_ROLES;</p>
+<p>------------------------------------------------------<br>
+  -- 암호를 가진 롤 생성<br>
+  CREATE ROLE std_role1 IDENTIFIED BY aaa;<br>
+  SELECT * FROM DBA_ROLES;</p>
+<p>------------------------------------------------------<br>
+  -- 롤에 부여된 권한 확인<br>
+  SELECT * FROM ROLE_TAB_PRIVS WHERE role='STD_ROLE';</p>
+<p>------------------------------------------------------<br>
+  -- 롤에 시스템 권한 부여<br>
+  GRANT RESOURCE, CONNECT, CREATE VIEW TO std_role;<br>
+  -- std_role 에 RESOURCE, CONNECT 롤, CREATE VIEW 시스템 권한 부여</p>
+<p>SELECT * FROM ROLE_ROLE_PRIVS WHERE role='STD_ROLE';<br>
+  -- 롤안의 롤 확인</p>
+<p>SELECT * FROM ROLE_SYS_PRIVS WHERE role='STD_ROLE';<br>
+  -- 시스템 권한 확인</p>
+<p>------------------------------------------------------<br>
+  -- 롤에 객체 권한 부여<a name="2042"></a><br>
+  -- 사용자<br>
+  GRANT SELECT, INSERT, UPDATE ON insa TO std_role;</p>
+<p>--sys 객체 권한 확인<a name="2043"></a><br>
+  SELECT * FROM ROLE_TAB_PRIVS WHERE role='STD_ROLE';<br>
+  <br>
+</p>
+<p><br>
+  -- ROLE 변경<a name="2044"></a><br>
+  -- 롤의 암호 제거<br>
+  ALTER ROLE std_role1 NOT IDENTIFIED;<br>
+SELECT * FROM dba_roles WHERE role='STD_ROLE1';</p>
+<p>-- 사용자에게 ROLE 부여<br>
+  CREATE USER sky1 IDENTIFIED BY king1;</p>
+<p>-- 사용자에게 ROLE 적용<br>
+  GRANT STD_ROLE TO sky1;</p>
+<p>-- sky1 계정<br>
+  SELECT * FROM scott.insa;</p>
+<p>-- sky1이 권한 확인<br>
+  SELECT * FROM USER_ROLE_PRIVS; -- 롤 확인<br>
+  SELECT * FROM USER_TAB_PRIVS; -- 객체 권한 확인<br>
+  SELECT * FROM USER_SYS_PRIVS; -- 시스템 권한 확인</p>
+<p> -- ROLL의 권한은 시스템 계정에서 확인<a name="2045"></a><br>
+  -- SELECT * FROM ROLE_ROLE_PRIVS<br>
+  -- SELECT * FROM ROLE_SYS_PRIVS<br>
+  -- SELECT * FROM ROLE_TAB_PRIVS<br>
+</p>
+<p>  <br>
+  -- ROLE 회수<a name="2046"></a><br>
+  -- SYS 계정<br>
+  REVOKE std_role FROM sky1;<br>
+</p>
+<p><br>
+-- PUBLIC 롤 : 모든 사용자에게 자동으로 권한 부여<a name="2047"></a></p>
+<p>CREATE ROLE pub_role; -- 롤 생성<br>
+  -- 롤에 권한 부여<br>
+  GRANT RESOURCE, CREATE VIEW, CONNECT TO pub_role;<br>
+  -- PUBLIC 롤<br>
+  GRANT pub_role TO PUBLIC WITH ADMIN OPTION;</p>
+<p>-- PUBLIC 롤 회수<br>
+  REVOKE pub_role FROM PUBLIC;<br>
+  -- REVOKE pub_role FROM sky1; -- 오류</p>
+<p>-- sky1 CONN 오류</p>
+<p>-- ROLE 삭제<br>
+  DROP ROLE pub_role;<br>
+  DROP ROLE std_role;<br>
+  DROP ROLE std_role1;</p>
+<p></p>
+<p></p>
+<p></p>
+<p><strong>21. 데이터 링크<a name="2101" id="2101"></a><br>
+  <br>
+</strong>
+  -- 데이터 링크</p>
+<p><br>
+  -- 데이터 링크 권한 설정<a name="2102" id="2102"></a><br>
+  -- SYS 계정<br>
+GRANT CREATE DATABASE LINK TO 사용자명;</p>
+<p>-- 사용자 계정<br>
+  CREATE DATABASE LINK link_test<br>
+  CONNECT TO 사용자명 IDENTIFIED BY &quot;암호&quot;<br>
+  USING <br>
+  '(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)<br>
+  (HOST=211.169.117.189)(PORT=1521))<br>
+  (CONNECT_DATA=(SERVICE_NAME=ORA)))';<br>
+  -- ORA : 데이터베이스 명(SID)<br>
+  -- 암호가 특수문자가 있는 경우에는 &quot;&quot; 안에 암호를 입력한다.</p>
+<p>SELECT name, basicPay FROM insa@link_test;<br>
+  -- 테이블명@링크명</p>
+<p>SELECT num, name, buseo, city, basicpay FROM insa@link_test WHERE buseo='개발부'<br>
+  UNION ALL<br>
+  SELECT num, name, buseo, city, basicpay FROM INSA WHERE city='인천';</p>
+<p>DROP DATABASE LINK link_test;<br>
+</p>
+<p>  -- tnsnames.ora 에 정의된 connect_identifier 으로 접속<a name="2103" id="2103"></a><br>
+  CMD&gt;sqlplus 사용자명/&quot;암호&quot;@ora111<br>
+  -- ora111 : tnsnames.ora 에 정의된 connect_identifier<br>
+</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><strong>22. 암호화 및 복호화 </strong></p>
+<p>--  암호화 및 복호화<a name="2201" id="2201"></a><br>
+  -- 암호화 기능을 이용하려면 DBMS_OBFUSCATION_TOOLKIT을 이용한다.<br>
+  <br>
+  -- 이 패키지는 4개의 프로시져로 이루어져 있다.<br>
+  - VARCHAR2 타입을 Encrypt/Decrypt할 수 있는 2개의 프로시져<br>
+  - RAW 타입을 Encrypt/Decrypt할 수 있는 2개의 프로시져<br>
+-- (다른 타입은 지원하지 않으므로 number인 경우는 to_char 이용)<br>
+</p>
+<p><br>
+  -- SYS 계정	<a name="2202" id="2202"></a><br>
+  SQL&gt;@D:/oracle/product/10.2.0/db_1/RDBMS/ADMIN/dbmsobtk.sql<br>
+SQL&gt;@D:/oracle/product/10.2.0/db_1/RDBMS/ADMIN/prvtobtk.plb</p>
+<p>--------------------------------------------<br>
+  -- 모든 사용자가 DBMS_OBFUSCATION_TOOLKIT 패키지의 프로시져를 사용 할 수 있는 권한 부여<br>
+  -- SYS 계정<br>
+  SQL&gt;GRANT execute ON dbms_obfuscation_toolkit TO public;<br>
+</p>
+<p><br>
+  -- 사용자 계정<a name="2203" id="2203"></a><br>
+  -- 패키지 선언<br>
+  CREATE OR REPLACE PACKAGE CryptIT AS <br>
+  FUNCTION encrypt( str VARCHAR2, <br>
+  hash VARCHAR2 ) RETURN VARCHAR2;<br>
+  FUNCTION decrypt( xCrypt VARCHAR2,<br>
+hash VARCHAR2 ) RETURN VARCHAR2;<br>
+  END CryptIT;<br>
+/</p>
+<p>-- 패키지 몸체<br>
+  CREATE OR REPLACE PACKAGE BODY CryptIT IS <br>
+  crypted_string VARCHAR2(2000);<br>
+  <br>
+  FUNCTION encrypt(str VARCHAR2, hash VARCHAR2)<br>
+  RETURN VARCHAR2<br>
+  IS<br>
+  pieces_of_eight NUMBER := ((FLOOR(LENGTH(str)/8 + .9)) * 8);<br>
+  BEGIN<br>
+  dbms_obfuscation_toolkit.DESEncrypt(<br>
+  input_string =&gt; RPAD(str, pieces_of_eight ),<br>
+  key_string =&gt; RPAD(hash,8,'#'), <br>
+  encrypted_string =&gt; crypted_string );</p>
+<p> RETURN crypted_string;<br>
+  END;<br>
+  <br>
+  FUNCTION decrypt( xCrypt VARCHAR2, hash VARCHAR2 )<br>
+  RETURN VARCHAR2 IS<br>
+  BEGIN<br>
+  dbms_obfuscation_toolkit.DESDecrypt(<br>
+  input_string =&gt; xCrypt, <br>
+  key_string =&gt; RPAD(hash,8,'#'), <br>
+  decrypted_string =&gt; crypted_string );</p>
+<p> RETURN TRIM(crypted_string);<br>
+  END;<br>
+  END CryptIT;</p>
+<p>/</p>
+<p>-- DESEncrypt, DESDecrypt 함수는 인수가 VARCHAR2, RAW인 프로시져가 있다.<br>
+  -- raw : 2진데이터, UTL_RAW.CAST_TO_RAW : 문자열을 2진 데이터로<br>
+  -- input_string VARCHAR2(32) := 'abcd';<br>
+  -- raw_input RAW(128) := UTL_RAW.CAST_TO_RAW(input_string);<br>
+  -- str VARCHAR2(32) := UTL_RAW.CAST_TO_VARCHAR2(raw_input));<br>
+</p>
+<p>--------------------------------------------------------<br>
+  -- 테스트<br>
+  CREATE TABLE exam(id NUMBER, pass VARCHAR2(20));</p>
+<p>-- 입력<br>
+  -- CryptIT.encrypt(비밀번호, 키값)<br>
+  INSERT INTO exam VALUES(1, CryptIT.encrypt('12345', 'test'));<br>
+</p>
+<p>-- 데이터 조회<br>
+  -- Decrypt 하지 않으면 결과값이 출력되지 않는다.<br>
+  SELECT id, pass FROM exam WHERE pass = '12345';</p>
+<p>SELECT id, pass FROM exam;<br>
+  SELECT id, DUMP(pass) FROM exam; -- DUMP : oracle 내부 저장형식</p>
+<p>SELECT id, CryptIT.decrypt(pass,'test') pass FROM exam;<br>
+</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><strong>23. SYS_RefCusor</strong><br>
+  <br>
+  <br>
+  -- SYS_REFCURSOR 예제<a name="2301" id="2301"></a><br>
+테이블의 여러 로우를 반복적으로 조회하기 위해 레퍼런스 커서(reference cursor)를 사용 한다.</p>
+<p>-----------------------------------------------------<br>
+  -- score 테이블 작성<br>
+  CREATE TABLE score(<br>
+  num NUMBER(7) PRIMARY KEY NOT NULL<br>
+  ,name VARCHAR2(20)<br>
+  ,birth DATE<br>
+  ,kor NUMBER(3)<br>
+  ,eng NUMBER(3)<br>
+  ,mat NUMBER(3)<br>
+  );</p>
+<p>-----------------------------------------------------<br>
+  INSERT INTO score (num, name, birth, kor, eng, mat)<br>
+  VALUES (1, '홍길동', '2000-10-10', 80, 80, 80);<br>
+  INSERT INTO score (num, name, birth, kor, eng, mat)<br>
+  VALUES (2, '이기자', '2000-11-11', 90, 50, 50);<br>
+  COMMIT;</p>
+<p>-----------------------------------------------------<br>
+  CREATE OR REPLACE PROCEDURE select_score<br>
+  (<br>
+  pResult OUT SYS_REFCURSOR, pSQL IN VARCHAR2 <br>
+  )<br>
+  IS<br>
+  BEGIN<br>
+  OPEN pResult FOR pSQL;<br>
+  --OPEN pResult FOR SELECT * FROM score;<br>
+  END;</p>
+<p>-----------------------------------------------------<br>
+  CREATE OR REPLACE PROCEDURE list_score<br>
+  (<br>
+  pSQL IN VARCHAR2 <br>
+  )<br>
+  IS<br>
+  result SYS_REFCURSOR;<br>
+  <br>
+  varNum SCORE.num%TYPE;<br>
+  varName SCORE.name%TYPE;<br>
+  varBirth SCORE.birth%TYPE;<br>
+  varKor SCORE.kor%TYPE;<br>
+  varEng SCORE.eng%TYPE;<br>
+  varMat SCORE.mat%TYPE;<br>
+  BEGIN<br>
+  select_score(result, pSQL);<br>
+  <br>
+  LOOP<br>
+  FETCH result INTO varNum, varName, varBirth,<br>
+  varKor, varEng, varMat;<br>
+  EXIT WHEN result%NOTFOUND;<br>
+  DBMS_OUTPUT.PUT_LINE(varNum || ' ' ||<br>
+  varName || ' ' || (varKor+varEng+varMat));<br>
+  END LOOP;<br>
+  END;</p>
+<p>-----------------------------------------------------<br>
+  EXEC LIST_SCORE('SELECT * FROM score');<br>
+</p>
+<p>&nbsp; </p>
+<p>-- insa 테이블의 자료를 출력하는 프로시저 작성<a name="2302" id="2302"></a><br>
+  -- (SYS_REFCURSOR 이용)<br>
+  SELECT name, basicpay FROM insa WHERE name LIKE '김%';<br>
+SELECT name, basicpay FROM insa WHERE name LIKE '이%';</p>
+<p>-----------------------------------------------------<br>
+  CREATE OR REPLACE PROCEDURE select_insa<br>
+  (<br>
+  pResult OUT SYS_REFCURSOR, pVar IN VARCHAR2 <br>
+  )<br>
+  IS<br>
+  BEGIN<br>
+  OPEN pResult FOR SELECT name, basicpay FROM insa<br>
+  WHERE name LIKE '%' || pVar || '%';<br>
+  END;</p>
+<p>-----------------------------------------------------<br>
+  CREATE OR REPLACE PROCEDURE list_insa<br>
+  (<br>
+  pVar IN VARCHAR2 <br>
+  )<br>
+  IS<br>
+  result SYS_REFCURSOR;<br>
+  <br>
+  vName INSA.name%TYPE;<br>
+  vBasicpay INSA.basicpay%TYPE;<br>
+  BEGIN<br>
+  select_insa(result, pVar);<br>
+  <br>
+  LOOP<br>
+  FETCH result INTO vName, vBasicpay;<br>
+  EXIT WHEN result%NOTFOUND;<br>
+  DBMS_OUTPUT.PUT_LINE(vName || ' ' || vBasicpay);<br>
+  END LOOP;<br>
+  END;</p>
+<p>-----------------------------------------------------<br>
+  EXEC list_insa('김');<br>
+  EXEC list_insa('이');<br>
+</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><strong>24. 인덱스</strong><br>
+  <br>
+  -- 인덱스<a name="2401" id="2401"></a><br>
+  -- 개요<br>
+index란 ROWID와 특정 컬럼의 정렬된 값을 set으로 하여 목록화한 것이다. 정렬해 놓은 컬럼의 각각의 값과 그에 해당하는 ROWID를 이용하여 곧 바로 data block에 접근하여 빠르게 해당 데이터를 찾아낸다. index는 자동으로 oracle에 의해 생성되기도 하고, 사용자가 직접 생성할 수 도 있다.</p>
+<p> index는 데이터를 보다 빠르게 검색할 수 있도록 도와주는 객체이다.<br>
+  DB의 성능을 향상시키고, 행(row)의 유일성을 보장하기 위해 사용된다.<br>
+  잘못된 인덱스는 DB의 성능을 오히려 저하시킨다.</p>
+<p>-- 특징<a name="2402" id="2402"></a><br>
+  빠른 검색을 위해 B*Tree를 사용하여 디스크의 입출력 횟수를 감소<br>
+  Oracle server가 자동으로 인덱스를 사용하고 유지 보수<br>
+  테이블과는 논리적, 물리적으로 독립<br>
+  생성, 삭제 시 다른 테이블이나 인덱스에 영향을 주지 않음<br>
+  각 인덱스는 page로 구성된 pointer와 컬럼 값으로 구성</p>
+<p>-- 생성<a name="2403" id="2403"></a><br>
+  자동 생성 : Unique 인덱스로 primary key 또는 Unique key 제약조건 생성시 자동으로 인덱스가 생성된다.(중복 값이 존재하면 생성 불가)<br>
+  수동 생성 : Non-Unique 인덱스로 access 시간을 향상시키기 위하여 사용자가 직접 생성한다. (중복 값이 존재 하는 경우)</p>
+<p>-- 종류<a name="2404" id="2404"></a><br>
+  1) LOGICAL 인덱스<a name="2405" id="2405"></a><br>
+  Single 컬럼 인덱스 : 하나의 컬럼 만 인덱스에 존재 <br>
+  concatenated 인덱스(composite 인덱스) : 여러 컬럼을 결합하여 하나의 인덱스를 생성(32개의 컬럼 까지)<br>
+  Unique 인덱스 : unique한 컬럼으로 인덱스<br>
+  non-unique 인덱스 : unique하지 않은 여러 컬럼을 수동으로 인덱스<br>
+  Function based(함수기반) 인덱스 : 연산자 또는 함수의 적용 결과에 따라 생성됨 </p>
+<p> 2) PHYSICAL 인덱스<a name="2406" id="2406"></a><br>
+  partitioned(분할) 인덱스 : 분할된 테이블을 생성하는 경우에 적용됨 <br>
+  non-partitioned(비 분할) 인덱스 : 인덱스를 분할하지 않음 <br>
+  non-partitioned(비 분할) B-Tree 인덱스 : balance tree 구조로 저장 <br>
+  non-partitioned(비 분할) Bitmap 인덱스 : bitmap 구조로 대용량인 경우 <br>
+  normal 인덱스<br>
+  reverse 인덱스 : B-Tree 인덱스에서 key 컬럼의 값을 뒤집어서 배열 </p>
+<p> PARTITIONED INDEX는 테이블의 데이터 량이 너무 커서 분할된 테이블을 생성하는 경우에 적용되는 방법이다. 따라서 테이블 분할에 사용되었던 partition 기능을 사용하여 인덱스를 분할한다. 이렇게 분할된 인덱스는 관리하기도 편하고, 각 segment를 여러 개의 tablespace에 나누어 저장하므로 I/O의 경합을 줄이는 효과도 얻을 수 있다.</p>
+<p>-- index 생성 시 유의사항<a name="2407" id="2407"></a><br>
+  1) 컬럼이 where절 또는 join 조건에서 자주 사용될 때<br>
+  2) 컬럼에 광범위한 값이 포함될 때<br>
+  3) 컬럼에 많은 수의 NULL값을 포함할 때<br>
+  4) 대형 테이블이고 대부분의 질의가 10~15% 이하로 읽어 들일 것으로 예상할 때</p>
+<p>-- index를 생성하지 않는 경우 유의사항<a name="2408" id="2408"></a><br>
+  1) 테이블에 자료의 양이 적을 때<br>
+  2) 컬럼이 질의 조건으로 자주 사용되지 않을 때<br>
+  3) 대부분의 질의들이 10~15%이상 읽어 들일 것으로 예상될 때<br>
+  4) 테이블이 자주 갱신될 때<br>
+</p>
+<p><br>
+  -- 형식<a name="2409" id="2409"></a><br>
+  -- B*Tree 인덱스<br>
+CREATE INDEX 인덱스명 ON 테이블명(컬럼명, ...);</p>
+<p>-- Bitmap 인덱스<br>
+  CREATE BITMAP INDEX 인덱스명 ON 테이블명(컬럼명, ...);</p>
+<p>-- 함수기반 인덱스<br>
+  CREATE INDEX 인덱스명 ON 테이블명(함수식(컬럼명)| 산술식);</p>
+<p>-- 역방향 인덱스<br>
+  CREATE INDEX 인덱스명 ON 테이블명(컬럼명1,컬럼명2,...) REVERSE;</p>
+<p>-- 내림차순 인덱스<br>
+  CREATE INDEX 인덱스명 ON 테이블명(컬럼명1,컬럼명2,... DESC);</p>
+<p> -- unique 옵션은 사용자가 직접 unique한 인덱스를 생성하고 할 때 사용한다. 디폴트는 non-unique 인덱스로 생성한다.<br>
+  -- bitmap 옵션은 사용자가 직접 bitmap index를 생성하고 할 때 사용한다.<br>
+</p>
+<p>  -- 인덱스 정보 조회<a name="2410"></a><br>
+  SELECT index_name, index_type, table_owner, table_name FROM user_indexes;<br>
+  SELECT index_name, table_name, column_name FROM user_ind_columns;<br>
+  <br>
+  <br>
+  -- 인덱스 생성<a name="2411"></a><br>
+자신 소유의 스키마에서 이 문을 실행하려면 UNLIMITED TABLESPACE 시스템 권한이 있어야 하고, <br>
+다른 스키마인 경우 CREATE ANY INDEX 시스템 권한이 있어야 한다</p>
+<p>--------------------------------------------<br>
+  -- 인덱스 실습 테이블 작성<br>
+  CREATE TABLE insa1 AS SELECT * FROM INSA;</p>
+<p>INSERT INTO insa1 SELECT * FROM INSA;<br>
+  INSERT INTO insa1 SELECT * FROM INSA;<br>
+  INSERT INTO insa1 SELECT * FROM INSA;<br>
+  INSERT INTO insa1 SELECT * FROM INSA;<br>
+  INSERT INTO insa1 SELECT * FROM INSA;<br>
+  -- 여러번 실행(많이)</p>
+<p>-- 인덱스 실습용 자료 추가<br>
+  INSERT INTO insa1 (num, name, ssn, ibsaDate, city, tel, buseo, jikwi, basicPay, sudang) VALUES<br>
+  (9001, '자바다', '010101-1022432', SYSDATE, '서울', '011-2356-4528', '기획부', '사원', 1150000, 100000);</p>
+<p>COMMIT;</p>
+<p>-- 성능향상을 위해 시간을 표시<a name="2412"></a><br>
+  SET TIMING ON</p>
+<p>-- 인텍스를 작성하지 않은 상태에서 검색<br>
+  SELECT name, ssn FROM insa1 WHERE name='자바다';</p>
+<p><br>
+  -- B-Tree 인덱스<a name="2413"></a><br>
+어떤 행에 대한 access 회수도 동일하게 하는 바이너리의 균형 탐색 tree이다. 찾으려는 행이 테이블 시작이나 끝 또는 중간에 있어도 거의 같은 횟수 내에 지정된 값을 access하는 효율적인 방법이다.</p>
+<p> B-tree index는 binary search index의 약자이며, 일명 balence tree index라고도 부른다.</p>
+<p> 밸런스 트리 인덱스를 만드는 기준은 다음과 같다.<br>
+  -- 인덱스를 만들어야 하는 열은 DML(insert, update, delete) 문의 WHERE 절에 자주 나오는 열이다.<br>
+  -- 조인되는 테이블의 조인 열에는 인덱스를 만들어야 한다.<br>
+  -- 인덱스에 NULL 값이 저장되지 않기 때문에, NULL 값이 많은 열에 인덱스를 만들면 유리하다.<br>
+  -- DML 문장의 WHERE 절에 의해 검색되는 데이터의 테이블 전체의 10～15%의 범위에 속할 때 인덱스를 만들어야 한다.<br>
+  -- 하나의 테이블에 인덱스를 많이 만들면 update, delete할 때 실행속도가 늦다.(하나의 테이블에 3~4개의 인덱스가 적당하다)</p>
+<p>SELECT index_name, table_owner, table_name FROM user_indexes;<br>
+  CREATE INDEX insa_name_idx ON insa1(name);<br>
+  SELECT index_name, table_owner, table_name FROM user_indexes;</p>
+<p>SELECT name, ssn FROM insa1 WHERE name='자바다';</p>
+<p>-- 인덱스 삭제<a name="2414"></a><br>
+  DROP INDEX insa_name_idx;</p>
+<p>  -- Bitmap 인덱스<a name="2415" id="2415"></a><br>
+Bitmap 인덱스는 위에서 내려오는 것과는 달리 여러 단계를 거치지 않고 단번에 해당 block에 찾아가는 것을 의미한다. 즉, 소수의 다른 값을 가진 컬럼에 대해 적합한 타입의 인덱스인데, 컬럼에 대해 극소수의 다른 값이 존재하고 쿼리에서 제한조건(where절의 AND, OR연산)으로서 이 컬럼을 자주 사용하는 경우 컬럼에 대해 bitmap 인덱스 사용을 고려해야 한다.</p>
+<p> -- 아주 큰 테이블에서 검색할 때 사용<br>
+  -- UPDATE, INSERT, DELETE 문이 자주 실행되지 않는 테이블에 사용<br>
+  -- 일반 인덱스의 크기가 너무 크거나 인덱스 생성 시간이 너무 많이 소요되는 경우에 사용</p>
+<p>CREATE BITMAP INDEX insa_name_idx ON insa1(name);<br>
+  SELECT index_name, table_owner, table_name FROM user_indexes;</p>
+<p>SELECT name, ssn FROM insa1 WHERE name='자바다';</p>
+<p>-- 인덱스 삭제<br>
+  DROP INDEX insa_name_idx;</p>
+<p><br>
+  -- Function based index(함수 기반 인덱스)<a name="2416"></a><br>
+  -- 인덱스가 생성될 컬럼에는 함수나 산술식, 상수, 사용자 정의 함수를 적용할 수 있다.<br>
+  -- 함수기반 인덱스를 생성하면 bitmap 인덱스가 생성된다(default).<br>
+-- 함수기반 인덱스 생성은 system 권한이 있어야 가능하다.</p>
+<p>CREATE INDEX insa_ssn_idx ON insa1(SUBSTR(ssn, 8, 1));<br>
+  SELECT index_name, table_owner, table_name FROM user_indexes;</p>
+<p>SELECT name, ssn FROM insa1 WHERE SUBSTR(ssn, 8, 1) IN (1, 3);</p>
+<p>-- 인덱스 삭제<br>
+  DROP INDEX insa_ssn_idx;</p>
+<p><br>
+  -- 인덱스 재생성<a name="2417"></a><br>
+인덱스가 만들어진 후 INSERT, UPDATE가 일어 난 경우 오라클이 자동으로 인덱스를 갱신하지만 DELETE는 논리적인 삭제 과정만 일어나고 인덱스는 그대로 남아 있다. 이런 경우 인덱스를 재 생성한다.</p>
+<p> ALTER ONDEX 인덱스명 REBUILD;<br>
+</p>
+<p><br>
+-- 인덱스 삭제</p>
+<p>SELECT index_name, table_owner, table_name FROM user_indexes;</p>
+<p>DROP INDEX insa_ssn_idx;</p>
+<p>SELECT index_name, table_owner, table_name FROM user_indexes;<br>
+</p>
+<p>DROP TABLE insa1 PURGE;<br>
+</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp; </p>
+<p><font color="#FFFFFF">오라클 10일차 자료 정리 완료 - </font></p>
+<p><font color="#FFFFFF">자료: KH 정보교육원 한장희 교수님 </font></p>
+<p><font color="#FFFFFF">html tag 작성 : Java 75기 엄기백 </font></p>
+<p><a style="display:scroll;position:fixed;bottom:500px;right:100px;"href="#"><img src="http://cfs10.tistory.com/image/1/tistory/2008/10/29/19/12/4908370057f9b" border="0" title="위로가기"><br>
+<font size="2">Mady by 엄기백</font></a></p>
+</body>
+</html>
+
